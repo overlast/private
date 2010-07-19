@@ -1,0 +1,60 @@
+escape ^z^z
+defhstatus "^En:^Et"
+#hardstatus "^En:^Et"
+#escape ^Tt
+vbell off
+#hardstatus alwayslastline "%w"
+startup_message off
+autodetach on
+
+# コピーモードで Emacs のような移動を可能にする
+# (man にも載っている定番)
+markkeys h=^b:l=^f:$=^e
+
+# “C-z (スペース)”でコピーモードに入った直後に最初のマークを付ける
+# スペースのかわりに生の ^@ とかを指定するとそれっぽくなります
+bind ' ' eval "copy" "stuff ' '"
+
+# 現在位置から行末までコピーする
+# URL のコピペに使えます(C-a C-k)
+bind ^k  eval "copy" "stuff ' $ '"
+
+bind ^y paste .
+
+hardstatus ignore "%w | %h"
+
+#タブ風のキャプション表示
+caption always "%{= wg} %-w%{=bu bw}%n %t%{-}%+w %=%{=b wb}%y/%m/%d  %{=b wb}%c"
+#hardstatus alwayslastline "[%02c] %`%-w%{=b bw}%n %t%{-}%+w"
+
+defscrollback 20000
+
+#
+idle 1200
+blankerprg /usr/games/fortune starwars
+
+#splitの設定
+bind x command -c REGION
+bind -c REGION 2 split
+bind -c REGION 1 only
+bind -c REGION 0 remove
+bind -c REGION o focus
+bind -c REGION \^ resize
+
+# Emacs の yank っぽいペースト法(C-z C-y)
+bind ^y paste .
+# クラス“launcher”として定義されたキーバインドへ移行する
+bind ^x eval "echo 'Launcher-mode:  [ t: top ] [ w: w3m -B] [c: perl -MCPAN ]'" "command -c launcher"
+# クラス“launcher”に属するキーバインドを設定
+bind -c launcher t screen top
+bind -c launcher w screen w3m -B
+bind -c launcher c screen perl -MCPAN -e shell
+bind -c launcher ^z command
+
+bind ^U encoding utf8
+bind ^E encoding euc
+
+defutf8 on
+defkanji utf-8
+encoding utf-8 utf-8
+defencoding UTF-8

@@ -172,7 +172,7 @@ sub make_psi_and_sample_vector {
         }
         else {
             for (my $j = 0; $j < $text_len; $j++) {
-                if ($suffix_arr_ref->[$i] eq ($suffix_arr_ref->[$j] - 1)) {
+                if (($suffix_arr_ref->[$i] + 1) eq $suffix_arr_ref->[$j]) {
                     $psi_vector_arr_ref->[$i] = $j;
                     $sample_vector_arr_ref->[$i] = "";
                 }

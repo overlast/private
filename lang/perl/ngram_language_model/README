@@ -1,0 +1,5 @@
+# check results of all scripts
+./sh/sample.sh
+
+# cleaning sample directry
+./sh/clean_sample.sh

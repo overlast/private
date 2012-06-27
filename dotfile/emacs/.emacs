@@ -12,6 +12,9 @@
 ;   $$ ln -s private/dotfile/emacs/.emacs ~/
 ;   $$ ln -s private/dotfile/emacs/.emacs.d ~/
 ;
+; Step 3. Installing other files
+;   $$ cpanm Project::Libs
+;
 ; That's all !! Very easy !!
 ;
 ;======================================================================

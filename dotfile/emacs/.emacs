@@ -1,6 +1,6 @@
 ;======================================================================
 ; @overlast's configure file of Emacs GNU Emacs 23.4.1 or later
-;
+1;
 ; How to use this .emacs file !?
 ;
 ; Step 1. Installing .emacs and elisp using github
@@ -56,10 +56,16 @@
           :url "http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el"
           :load-path (".")
           )
-   (:name perlbrew-mode
+   (:name perlbrew
           :description "perlbrew"
           :type git
           :url "https://github.com/kentaro/perlbrew.el.git"
+          :load-path (".")
+          )
+   (:name perlbrew-mini
+          :description "perlbrew-mini"
+          :type git
+          :url "git://github.com/dams/perlbrew-mini.el.git"
           :load-path (".")
           )
    )
@@ -171,6 +177,7 @@
 ;======================================================================
 ; FlyMake
 ; http://www.emacswiki.org/emacs-zh/FlyMake
+; http://d.hatena.ne.jp/sugyan/20120103/1325601340
 ;======================================================================
 
 (require 'flymake)
@@ -185,6 +192,7 @@
 (defun flymake-display-err-minibuf ()
   "Displays the error/warning for the current line in the minibuffer"
   (interactive)
+  (flymake-goto-next-error)
   (let* ((line-no             (flymake-current-line-no))
          (line-err-info-list  (nth 0 (flymake-find-err-info flymake-err-info line-no)))
          (count               (length line-err-info-list)))
@@ -194,57 +202,87 @@
                (full-file  (flymake-ler-full-file (nth (1- count) line-err-info-list)))
                (text (flymake-ler-text (nth (1- count) line-err-info-list)))
                (line       (flymake-ler-line (nth (1- count) line-err-info-list))))
-          (message "[%s] %s" line text)))
-      (setq count (1- count)))))
+          (message "[%s] %s" line text)
+          )
+        )
+      (setq count (1- count)
+            )
+      )
+    )
+  )
 
 ; C++ mode
 ; http://d.hatena.ne.jp/suztomo/20080905/1220633281
-(defun flymake-cc-init ()
-  (let* ((temp-file   (flymake-init-create-temp-buffer-copy
-                       'flymake-create-temp-inplace))
-         (local-file  (file-relative-name
-                       temp-file
-                       (file-name-directory buffer-file-name))))
-    (list "g++" (list "-Wall" "-Wextra" "-fsyntax-only" local-file))))
-(push '("\\.cpp$" flymake-cc-init) flymake-allowed-file-name-masks)
-(push '("\\.hpp$" flymake-cc-init) flymake-allowed-file-name-masks)
-(push '("\\.cc$" flymake-cc-init) flymake-allowed-file-name-masks)
-(add-hook 'c++-mode-hook
-          '(lambda ()
-             (flymake-mode t)))
+
+(autoload 'c++-mode "cc-mode" nil t)
+(eval-after-load "cc-mode"
+  '(progn
+     (defun flymake-cc-init ()
+       (let* ((temp-file   (flymake-init-create-temp-buffer-copy
+                            'flymake-create-temp-inplace))
+              (local-file  (file-relative-name
+                            temp-file
+                            (file-name-directory buffer-file-name))))
+         (list "g++" (list "-Wall" "-pedantic" "-Wextra" "-fsyntax-only" local-file))))
+     (push '("\\.cpp$" flymake-cc-init) flymake-allowed-file-name-masks)
+     (push '("\\.hpp$" flymake-cc-init) flymake-allowed-file-name-masks)
+     (push '("\\.cc$" flymake-cc-init) flymake-allowed-file-name-masks)
+     (add-hook 'c++-mode-hook
+               '(lambda ()
+                  (flymake-mode t)
+                  (define-key c++-mode-map "\C-cd" 'flymake-display-err-minibuf)
+                  ))
+     ))
 
 ;
 ; C mode
-(defun flymake-c-init ()
-  (let* ((temp-file   (flymake-init-create-temp-buffer-copy
-                       'flymake-create-temp-inplace))
-         (local-file  (file-relative-name
-                       temp-file
-                       (file-name-directory buffer-file-name))))
-    (list "gcc" (list "-Wall" "-Wextra" "-fsyntax-only" local-file))))
-(push '("\\.c$" flymake-c-init) flymake-allowed-file-name-masks)
-(add-hook 'c-mode-hook
-          '(lambda ()
-             (flymake-mode t)))
+(autoload 'c-mode "cc-mode" nil t)
+(eval-after-load "cc-mode"
+  '(progn
+     (defun flymake-c-init ()
+       (let* ((temp-file   (flymake-init-create-temp-buffer-copy
+                            'flymake-create-temp-inplace))
+              (local-file  (file-relative-name
+                            temp-file
+                            (file-name-directory buffer-file-name))))
+         (list "gcc" (list "-Wall" "-pedantic" "-Wextra" "-fsyntax-only" local-file))))
+     (push '("\\.c$" flymake-c-init) flymake-allowed-file-name-masks)
+     (add-hook 'c-mode-hook
+               '(lambda ()
+                  (flymake-mode t)
+                  (define-key c-mode-map "\C-cd" 'flymake-display-err-minibuf)
+                  ))
+     ))
 
-;; Perl
-;; http://d.hatena.ne.jp/antipop/20080701/1214838633
-;; http://unknownplace.org/memo/2007/12/21#e001
+; Perl mode
+; http://ash.roova.jp/perl-to-the-people/emacs-cperl-mode.html
+; http://d.hatena.ne.jp/antipop/20110413/1302671667
+; https://github.com/kentaro/perlbrew.el/blob/master/perlbrew.el
+; https://github.com/dams/perlbrew-mini.el
+; http://search.cpan.org/dist/Project-Libs/lib/Project/Libs.pm
+; http://d.hatena.ne.jp/sugyan/20120227/1330343152
 
-(require 'perlbrew)
-(perlbrew-switch "perl-5.12.4")
-
-(defvar flymake-perl-err-line-patterns '(("\\(.*\\) at \\([^ \n]+\\) line \\([0-9]+\\)[,.\n]" 2 3 nil 1)))
-(add-to-list 'flymake-allowed-file-name-masks
-             '("\\(\\.pl\\|\\.pm\\|\\.t\\|\\.psgi\\)$" flymake-perl-init))
-
-(defun flymake-perl-init ()
-  (let* ((temp-file (flymake-init-create-temp-buffer-copy
-                     'flymake-create-temp-inplace))
-         (local-file (file-relative-name
-                      temp-file
-                      (file-name-directory buffer-file-name))))
-    (list (perlbrew-get-current-perl-path) (list "-MProject::Libs" "-wc" local-file))))
-
-(add-hook 'cperl-mode-hook (lambda () (flymake-mode t)))
+(autoload 'cperl-mode "cperl-mode" nil t)
+(defalias 'perl-mode 'cperl-mode) ; show preference for cperl-mode
+(setq auto-mode-alist
+      (append '(("\\.\\(cgi\\|t\\|psgi\\)$" . cperl-mode))
+              auto-mode-alist))
+(eval-after-load "cperl-mode"
+  '(progn
+     (require 'perlbrew-mini)
+     (perlbrew-mini-use "perl-5.14.2")
+     (defvar flymake-perl-err-line-patterns
+       '(("\\(.*\\) at \\([^ \n]+\\) line \\([0-9]+\\)[,.\n]" 2 3 nil 1)))
+     (add-to-list 'flymake-allowed-file-name-masks
+                  '("\\(pl\\|pm\\|cgi\\|t\\|psgi\\)$" flymake-perl-init))
+     (defun flymake-perl-init ()
+       (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                          'flymake-create-temp-inplace))
+              (local-file (file-relative-name
+                           temp-file
+                           (file-name-directory buffer-file-name))))
+         (list (perlbrew-mini-get-current-perl-path)
+               (list "-MProject::Libs" "-wc" local-file))))
+     (add-hook 'cperl-mode-hook (lambda () (flymake-mode t)))
+     ))
 

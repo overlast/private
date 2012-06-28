@@ -39,8 +39,11 @@
 )
 (setq el-get-sources
  '(el-get
+   anything
+   auto-complete
    browse-kill-ring
    session
+   perl-completion
    (:name auto-save-buffers
           :description "auto-save-buffers: Saving the buffers automaticaly every N seconds."
           :type http
@@ -95,6 +98,7 @@
 (global-set-key "\C-x\C-b" 'buffer-menu) ; Use current buffer when you open the buffer menu
 (global-set-key "\C-xl" 'goto-line) ; Activate goto-line keybind
 (setq history-length t) ; mini buffer history length. if you set t which means infinity.
+(global-font-lock-mode t) ; coloring the words on a buffer
 
 ;======================================================================
 ; browse-kill-ring
@@ -166,6 +170,7 @@
 ;======================================================================
 
 (add-to-list 'ac-dictionary-directories "~/.emacs.d/dict")
+(require 'auto-complete)
 (require 'auto-complete-config)
 (ac-config-default)
 
@@ -226,6 +231,8 @@
                '(lambda ()
                   (flymake-mode t)
                   (define-key c++-mode-map "\C-cd" 'flymake-display-err-minibuf)
+                  (c-toggle-auto-hungry-state 1) ; inserting newline and indent when you push ';'
+                  (define-key c-mode-base-map "\C-m" 'newline-and-indent) ; inserting newline and indent when you push '\n'
                   ))
      ))
 
@@ -246,6 +253,8 @@
                '(lambda ()
                   (flymake-mode t)
                   (define-key c-mode-map "\C-cd" 'flymake-display-err-minibuf)
+                  (c-toggle-auto-hungry-state 1) ; inserting newline and indent when you push ';'
+                  (define-key c-mode-base-map "\C-m" 'newline-and-indent) ; inserting newline and indent when you push '\n'
                   ))
      ))
 
@@ -275,6 +284,12 @@
        '(("\\(.*\\) at \\([^ \n]+\\) line \\([0-9]+\\)[,.\n]" 2 3 nil 1)))
      (add-to-list 'flymake-allowed-file-name-masks
                   '("\\(pl\\|pm\\|cgi\\|t\\|psgi\\)$" flymake-perl-init))
+
+     ; http://d.hatena.ne.jp/sugyan/20100705/1278306885
+     (defadvice flymake-post-syntax-check (before flymake-force-check-was-interrupted)
+       (setq flymake-check-was-interrupted t))
+     (ad-activate 'flymake-post-syntax-check)
+
      (defun flymake-perl-init ()
        (let* ((temp-file (flymake-init-create-temp-buffer-copy
                           'flymake-create-temp-inplace))
@@ -283,6 +298,20 @@
                            (file-name-directory buffer-file-name))))
          (list (perlbrew-mini-get-current-perl-path)
                (list "-MProject::Libs" "-wc" local-file))))
-     (add-hook 'cperl-mode-hook (lambda () (flymake-mode t)))
+
+     (add-hook 'cperl-mode-hook (lambda ()
+                                  ; http://d.hatena.ne.jp/IMAKADO/20081129/1227893458
+                                  (require 'perl-completion)
+
+                                  ; http://d.hatena.ne.jp/sugyan/20120103/1325523629
+                                  (interactive)
+
+                                  (defvar ac-source-my-perl-completion
+                                    '((candidates . plcmp-ac-make-cands)))
+                                  (add-to-list 'ac-sources 'ac-source-my-perl-completion)
+
+                                  (perl-completion-mode t)
+                                  (flymake-mode t)
+                                  ))
      ))
 

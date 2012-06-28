@@ -1,6 +1,6 @@
 ;======================================================================
 ; @overlast's configure file of Emacs GNU Emacs 23.4.1 or later
-1;
+;
 ; How to use this .emacs file !?
 ;
 ; Step 1. Installing .emacs and elisp using github
@@ -169,14 +169,6 @@
 (require 'auto-complete-config)
 (ac-config-default)
 
-
-;======================================================================
-; set-perl5libs
-; http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el
-;======================================================================
-
-(require 'set-perl5lib)
-
 ;======================================================================
 ; FlyMake
 ; http://www.emacswiki.org/emacs-zh/FlyMake
@@ -260,8 +252,6 @@
 ; Perl mode
 ; http://ash.roova.jp/perl-to-the-people/emacs-cperl-mode.html
 ; http://d.hatena.ne.jp/antipop/20110413/1302671667
-; https://github.com/kentaro/perlbrew.el/blob/master/perlbrew.el
-; https://github.com/dams/perlbrew-mini.el
 ; http://search.cpan.org/dist/Project-Libs/lib/Project/Libs.pm
 ; http://d.hatena.ne.jp/sugyan/20120227/1330343152
 
@@ -272,8 +262,15 @@
               auto-mode-alist))
 (eval-after-load "cperl-mode"
   '(progn
+
+     ; https://github.com/kentaro/perlbrew.el/blob/master/perlbrew.el
+     ; https://github.com/dams/perlbrew-mini.el
      (require 'perlbrew-mini)
      (perlbrew-mini-use "perl-5.14.2")
+
+     ; http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el
+     (require 'set-perl5lib)
+
      (defvar flymake-perl-err-line-patterns
        '(("\\(.*\\) at \\([^ \n]+\\) line \\([0-9]+\\)[,.\n]" 2 3 nil 1)))
      (add-to-list 'flymake-allowed-file-name-masks

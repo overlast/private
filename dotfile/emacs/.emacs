@@ -12,7 +12,7 @@
 ;   $$ ln -s private/dotfile/emacs/.emacs ~/
 ;   $$ ln -s private/dotfile/emacs/.emacs.d ~/
 ;
-; Step 3. Installing other files
+; Step 3. Installing other resources
 ;   $$ cpanm Project::Libs
 ;
 ; That's all !! Very easy !!
@@ -39,11 +39,6 @@
 )
 (setq el-get-sources
  '(el-get
-   anything
-   auto-complete
-   browse-kill-ring
-   session
-   perl-completion
    (:name auto-save-buffers
           :description "auto-save-buffers: Saving the buffers automaticaly every N seconds."
           :type http
@@ -74,6 +69,18 @@
           :url "git://github.com/dams/perlbrew-mini.el.git"
           :load-path (".")
           )
+   (:name color-theme-mirror
+          :description "An Emacs-Lisp package with more than 50 color themes for your use. For questions about color-theme"
+          :type http-tar
+          :options ("xfz")
+          :url "http://mirror.yongbok.net/nongnu/color-theme/color-theme-6.6.0.tar.gz"
+          :load "color-theme.el"
+          :features "color-theme"
+          :post-init (lambda ()
+                       (color-theme-initialize)
+                       (setq color-theme-is-global t)
+                       )
+          )
    )
 )
 (el-get 'sync)
@@ -82,6 +89,7 @@
 ; Setting about languages and charactor encodings
 ;======================================================================
 
+(setq inhibit-startup-message t) ; Don't show the starting message
 (define-key global-map "\C-h" 'delete-backward-char) ; Backspace
 (setq backup-inhibited t) ; Don't make backup files
 (setq delete-auto-save-files t) ; Delete auto save files when you shutdown the Emacs
@@ -91,19 +99,49 @@
 (setq kill-whole-line t) ; Delete line when you push the key of k only time
 (setq require-final-newline t) ; Require newline at final line
 (display-time) ; Show the current time at the mode line
-(setq-default tab-width 2 indent-tabs-mode nil) ; Set tab width and replace indent tabs to spaces
 (add-hook 'before-save-hook 'delete-trailing-whitespace) ; Delete last tabs and spaces on each lines when you save the buffer
 (setq transient-mark-mode t) ; Show selected area
 (global-set-key "\C-o" 'dabbrev-expand) ; Activate dinamic abbribiation decode
 (global-set-key "\C-x\C-b" 'buffer-menu) ; Use current buffer when you open the buffer menu
 (global-set-key "\C-xl" 'goto-line) ; Activate goto-line keybind
 (setq history-length t) ; mini buffer history length. if you set t which means infinity.
-(global-font-lock-mode t) ; coloring the words on a buffer
+(global-font-lock-mode t) ; coloring the global words on a buffer
+(show-paren-mode 1) ; hilighting the parent bracket
+(setq eshell-ask-to-save-history (quote always))
+(setq eshell-hist-ignoredups t)
+(setq eshell-glob-include-dot-dot nil)
+(setq eshell-cmpl-cycle-completions t)
+(global-hl-line-mode) ; hilighting cullent line
+(setq hl-line-face 'underline) ; hilighting using under line
+(savehist-mode 1) ; saving history of mini buffer
+(setq recentf-max-saved-items 10000) ; setting length of recent open file list
+
+; Automatic spell checker
+; http://www.clear-code.com/blog/2012/3/20.html
+(setq-default flyspell-mode t)
+(setq ispell-dictionary "american")
+
+; Allow chmod 755 when you save a script has '#!**' in first line
+; http://www.clear-code.com/blog/2012/3/20.html
+(add-hook 'after-save-hook
+          'executable-make-buffer-file-executable-if-script-p)
+
+; Adding directory name if there are some filenames which have same name.
+; http://www.clear-code.com/blog/2012/3/20.html
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'post-forward-angle-brackets)
+
+; Color Setting
+; http://gnuemacscolorthemetest.googlecode.com/svn/html/index-c.htm
+(el-get 'sync '(color-theme-mirror))
+(require 'color-theme)
+(color-theme-dark-laptop)
 
 ;======================================================================
 ; browse-kill-ring
 ; http://www.yumi-chan.com/emacs/emacs_el_medium.html
 ;======================================================================
+(el-get 'sync '(browse-kill-ring))
 (require 'browse-kill-ring)
 (global-set-key "\M-y" 'browse-kill-ring)
 (make-face 'separator)
@@ -123,6 +161,8 @@
 ; Saving information about kill-ring and files which you opened in mini buffer
 ; http://0xcc.net/unimag/3/
 ;======================================================================
+
+(el-get 'sync '(session))
 (require 'session)
 (add-hook 'after-init-hook 'session-initialize)
 (when (require 'session nil t)
@@ -154,6 +194,7 @@
 ; http://0xcc.net/misc/auto-save/
 ;======================================================================
 
+(el-get 'sync '(auto-save-buffers))
 (require 'auto-save-buffers)
 (run-with-idle-timer 5 t 'auto-save-buffers)
 
@@ -162,6 +203,7 @@
 ; http://www.sodan.org/~knagano/emacs/minibuf-isearch/
 ;======================================================================
 
+(el-get 'sync '(minibuf-isearch))
 (require 'minibuf-isearch nil t)
 
 ;======================================================================
@@ -169,6 +211,7 @@
 ; http://cx4a.org/software/auto-complete/manual.ja.html
 ;======================================================================
 
+(el-get 'sync '(auto-complete))
 (add-to-list 'ac-dictionary-directories "~/.emacs.d/dict")
 (require 'auto-complete)
 (require 'auto-complete-config)
@@ -229,10 +272,11 @@
      (push '("\\.cc$" flymake-cc-init) flymake-allowed-file-name-masks)
      (add-hook 'c++-mode-hook
                '(lambda ()
-                  (flymake-mode t)
+                  (setq-default tab-width 2 indent-tabs-mode nil) ; Set tab width and replace indent tabs to spaces
                   (define-key c++-mode-map "\C-cd" 'flymake-display-err-minibuf)
                   (c-toggle-auto-hungry-state 1) ; inserting newline and indent when you push ';'
                   (define-key c-mode-base-map "\C-m" 'newline-and-indent) ; inserting newline and indent when you push '\n'
+                  (flymake-mode t)
                   ))
      ))
 
@@ -251,10 +295,11 @@
      (push '("\\.c$" flymake-c-init) flymake-allowed-file-name-masks)
      (add-hook 'c-mode-hook
                '(lambda ()
-                  (flymake-mode t)
+                  (setq-default tab-width 2 indent-tabs-mode nil) ; Set tab width and replace indent tabs to spaces
                   (define-key c-mode-map "\C-cd" 'flymake-display-err-minibuf)
                   (c-toggle-auto-hungry-state 1) ; inserting newline and indent when you push ';'
                   (define-key c-mode-base-map "\C-m" 'newline-and-indent) ; inserting newline and indent when you push '\n'
+                  (flymake-mode t)
                   ))
      ))
 
@@ -274,10 +319,12 @@
 
      ; https://github.com/kentaro/perlbrew.el/blob/master/perlbrew.el
      ; https://github.com/dams/perlbrew-mini.el
+     (el-get 'sync '(perlbrew-mini))
      (require 'perlbrew-mini)
      (perlbrew-mini-use "perl-5.14.2")
 
      ; http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el
+     (el-get 'sync '(set-perl5lib))
      (require 'set-perl5lib)
 
      (defvar flymake-perl-err-line-patterns
@@ -301,7 +348,10 @@
 
      (add-hook 'cperl-mode-hook (lambda ()
                                   ; http://d.hatena.ne.jp/IMAKADO/20081129/1227893458
+                                  (el-get 'sync '(perl-completion))
                                   (require 'perl-completion)
+
+                                  (setq-default tab-width 2 indent-tabs-mode nil) ; Set tab width and replace indent tabs to spaces
 
                                   ; http://d.hatena.ne.jp/sugyan/20120103/1325523629
                                   (interactive)
@@ -315,3 +365,10 @@
                                   ))
      ))
 
+
+;; emacs-lisp-mode
+(add-hook
+ 'emacs-lisp-mode-hook
+ (lambda ()
+   (setq-default tab-width 2 indent-tabs-mode nil) ; Set tab width and replace indent tabs to spaces
+   ))

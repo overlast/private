@@ -351,7 +351,7 @@
                                   (el-get 'sync '(perl-completion))
                                   (require 'perl-completion)
 
-                                  (setq-default tab-width 2 indent-tabs-mode nil) ; Set tab width and replace indent tabs to spaces
+                                  (setq-default tab-width 4 indent-tabs-mode nil) ; Set tab width and replace indent tabs to spaces
 
                                   ; http://d.hatena.ne.jp/sugyan/20120103/1325523629
                                   (interactive)

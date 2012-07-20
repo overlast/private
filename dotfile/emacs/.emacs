@@ -330,7 +330,7 @@
      (defvar flymake-perl-err-line-patterns
        '(("\\(.*\\) at \\([^ \n]+\\) line \\([0-9]+\\)[,.\n]" 2 3 nil 1)))
      (add-to-list 'flymake-allowed-file-name-masks
-                  '("\\(pl\\|pm\\|cgi\\|t\\|psgi\\)$" flymake-perl-init))
+                  '("\\([Pp][Llm]\\|cgi\\|t\\|psgi\\)$" flymake-perl-init))
 
      ; http://d.hatena.ne.jp/sugyan/20100705/1278306885
      (defadvice flymake-post-syntax-check (before flymake-force-check-was-interrupted)
@@ -347,11 +347,22 @@
                (list "-MProject::Libs" "-wc" local-file))))
 
      (add-hook 'cperl-mode-hook (lambda ()
+                                  ; Set tab width and replace indent tabs to spaces
+                                  (setq indent-tabs-mode nil)
+                                  (setq cperl-font-lock t)
+                                  (cperl-set-style "PerlStyle")
+
+                                  (setq cperl-close-paren-offset -4)
+                                  (setq cperl-continued-statement-offset 4)
+                                  (setq cperl-indent-level 4)
+                                  (setq cperl-indent-parens-as-block t)
+                                  (setq cperl-tab-always-indent t)
+                                  (setq cperl-label-offset -4)
+                                  (setq cperl-highlight-variables-indiscriminately t)
+
                                   ; http://d.hatena.ne.jp/IMAKADO/20081129/1227893458
                                   (el-get 'sync '(perl-completion))
                                   (require 'perl-completion)
-
-                                  (setq-default tab-width 4 indent-tabs-mode nil) ; Set tab width and replace indent tabs to spaces
 
                                   ; http://d.hatena.ne.jp/sugyan/20120103/1325523629
                                   (interactive)

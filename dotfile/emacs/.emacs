@@ -162,19 +162,19 @@
 ; http://0xcc.net/unimag/3/
 ;======================================================================
 
-;(el-get 'sync '(session))
-;(require 'session)
-;(add-hook 'after-init-hook 'session-initialize)
-;(when (require 'session nil t)
-;  (setq session-initialize '(de-saveplace session keys menus places)
-;        session-globals-include '((kill-ring 50)
-;                                  (session-file-alist 500 t)
-;                                  (file-name-history 10000)
-;                                  )
-;        )
-;  (add-hook 'after-init-hook 'session-initialize)
-;  (setq session-undo-check -1) ; Redume cursor position when you close the file.
-;  )
+(el-get 'sync '(session))
+(require 'session)
+(add-hook 'after-init-hook 'session-initialize)
+(when (require 'session nil t)
+  (setq session-initialize '(de-saveplace session keys menus places)
+        session-globals-include '((kill-ring 50)
+                                  (session-file-alist 500 t)
+                                  (file-name-history 10000)
+                                  )
+        )
+  (add-hook 'after-init-hook 'session-initialize)
+  (setq session-undo-check -1) ; Redume cursor position when you close the file.
+  )
 
 ;======================================================================
 ; Setting about languages and charactor encodings
@@ -316,12 +316,11 @@
               auto-mode-alist))
 (eval-after-load "cperl-mode"
   '(progn
-
      ; https://github.com/kentaro/perlbrew.el/blob/master/perlbrew.el
      ; https://github.com/dams/perlbrew-mini.el
      (el-get 'sync '(perlbrew-mini))
      (require 'perlbrew-mini)
-     (perlbrew-mini-use "perl-5.14.2")
+     (perlbrew-mini-use "perl-5.16.1")
 
      ; http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el
      (el-get 'sync '(set-perl5lib))
@@ -329,13 +328,8 @@
 
      (defvar flymake-perl-err-line-patterns
        '(("\\(.*\\) at \\([^ \n]+\\) line \\([0-9]+\\)[,.\n]" 2 3 nil 1)))
-     (add-to-list 'flymake-allowed-file-name-masks
-                  '("\\([Pp][Llm]\\|cgi\\|t\\|psgi\\)$" flymake-perl-init))
-
-     ; http://d.hatena.ne.jp/sugyan/20100705/1278306885
-     (defadvice flymake-post-syntax-check (before flymake-force-check-was-interrupted)
-       (setq flymake-check-was-interrupted t))
-     (ad-activate 'flymake-post-syntax-check)
+     (defconst flymake-allowed-perl-file-name-masks
+       '("\\([Pp][Llm]\\|cgi\\|t\\|psgi\\)$" flymake-perl-init))
 
      (defun flymake-perl-init ()
        (let* ((temp-file (flymake-init-create-temp-buffer-copy
@@ -346,33 +340,45 @@
          (list (perlbrew-mini-get-current-perl-path)
                (list "-MProject::Libs" "-wc" local-file))))
 
+     (defun flymake-perl-load ()
+       (interactive)
+       ; http://d.hatena.ne.jp/sugyan/20100705/1278306885
+       (defadvice flymake-post-syntax-check (before flymake-force-check-was-interrupted)
+         (setq flymake-check-was-interrupted t))
+       (ad-activate 'flymake-post-syntax-check)
+       (setq flymake-allowed-file-name-masks (append flymake-allowed-file-name-masks flymake-allowed-perl-file-name-masks))
+       (setq flymake-err-line-patterns flymake-perl-err-line-patterns)
+       (set-perl5lib)
+       (flymake-mode t)
+       )
+
      (add-hook 'cperl-mode-hook (lambda ()
                                   ; Set tab width and replace indent tabs to spaces
-                                  (setq indent-tabs-mode nil)
-                                  (setq cperl-font-lock t)
-                                  (cperl-set-style "PerlStyle")
+;                                  (setq indent-tabs-mode nil)
+;                                  (setq cperl-font-lock t)
+;                                  (cperl-set-style "PerlStyle")
 
-                                  (setq cperl-close-paren-offset -4)
-                                  (setq cperl-continued-statement-offset 4)
-                                  (setq cperl-indent-level 4)
-                                  (setq cperl-indent-parens-as-block t)
-                                  (setq cperl-tab-always-indent t)
-                                  (setq cperl-label-offset -4)
-                                  (setq cperl-highlight-variables-indiscriminately t)
+;                                  (setq cperl-close-paren-offset -4)
+;                                  (setq cperl-continued-statement-offset 4)
+;                                  (setq cperl-indent-level 4)
+;                                  (setq cperl-indent-parens-as-block t)
+;                                  (setq cperl-tab-always-indent t)
+;                                  (setq cperl-label-offset -4)
+;                                  (setq cperl-highlight-variables-indiscriminately t)
 
                                   ; http://d.hatena.ne.jp/IMAKADO/20081129/1227893458
-                                  (el-get 'sync '(perl-completion))
-                                  (require 'perl-completion)
+;                                  (el-get 'sync '(perl-completion))
+;                                  (require 'perl-completion)
 
                                   ; http://d.hatena.ne.jp/sugyan/20120103/1325523629
-                                  (interactive)
+;                                  (interactive)
 
-                                  (defvar ac-source-my-perl-completion
-                                    '((candidates . plcmp-ac-make-cands)))
-                                  (add-to-list 'ac-sources 'ac-source-my-perl-completion)
+;                                  (defvar ac-source-my-perl-completion
+;                                    '((candidates . plcmp-ac-make-cands)))
+;                                  (add-to-list 'ac-sources 'ac-source-my-perl-completion)
 
-                                  (perl-completion-mode t)
-                                  (flymake-mode t)
+;                                  (perl-completion-mode t)
+                                  (flymake-perl-load)
                                   ))
      ))
 

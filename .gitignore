@@ -1,12 +1,5 @@
-dotfile/emacs/.emacs.d/el-get/auto-save-buffers/auto-save-buffers.el
-dotfile/emacs/.emacs.d/el-get/auto-save-buffers/auto-save-buffers.elc
-dotfile/emacs/.emacs.d/el-get/browse-kill-ring/browse-kill-ring.el
-dotfile/emacs/.emacs.d/el-get/browse-kill-ring/browse-kill-ring.elc
-dotfile/emacs/.emacs.d/el-get/el-get
-dotfile/emacs/.emacs.d/el-get/minibuf-isearch/minibuf-isearch.elc
-dotfile/emacs/.emacs.d/el-get/session/session-2.2a.tar.gz
-dotfile/emacs/.emacs.d/el-get/set-perl5lib/set-perl5lib.elc
 dotfile/emacs/.emacs.d/history
-dotfile/emacs/.emacs.d/el-get/session/session/
 dotfile/emacs/.emacs.d/el-get/*
 dotfile/emacs/.emacs.d/auto-save-list/
+dotfile/emacs/.emacs.d/ac-comphist.dat
+

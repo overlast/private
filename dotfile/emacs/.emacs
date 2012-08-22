@@ -69,6 +69,12 @@
           :url "git://github.com/dams/perlbrew-mini.el.git"
           :load-path (".")
           )
+   (:name fm
+          :description "fm"
+          :type http
+          :url "http://www.anc.ed.ac.uk/~stephen/emacs/fm.el"
+          :load-path (".")
+          )
    (:name color-theme-mirror
           :description "An Emacs-Lisp package with more than 50 color themes for your use. For questions about color-theme"
           :type http-tar
@@ -115,6 +121,32 @@
 (setq hl-line-face 'underline) ; hilighting using under line
 (savehist-mode 1) ; saving history of mini buffer
 (setq recentf-max-saved-items 10000) ; setting length of recent open file list
+
+;; use editable dired (C-x d, select directory and r)
+(require 'wdired)
+(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)
+
+;; show a contents of a selected file in other buffer
+;; http://www.bookshelf.jp/soft/meadow_47.html#SEC696
+;(el-get 'sync '(fm))
+;(require 'fm)
+;(add-hook 'occur-mode-hook 'fm-start)
+;(add-hook 'compilation-mode-hook 'fm-start)
+
+;; use ultra rich occur
+;; http://www.bookshelf.jp/soft/meadow_50.html#SEC746
+(el-get 'sync '(color-moccur))
+(require 'color-moccur)
+;; http://d.hatena.ne.jp/higepon/20060222/1140579843
+(setq color-occur-kill-occur-buffer t)
+(setq *moccur-buffer-name-exclusion-list*
+      '("\.svn" "\.git" "*Completions*" "*Messages*"))
+
+;; use editable search result of moccur
+;; http://www.bookshelf.jp/soft/meadow_50.html#SEC769
+(el-get 'sync '(moccur-edit))
+(load "moccur-edit")
+(setq moccur-split-word t)
 
 ; Automatic spell checker
 ; http://www.clear-code.com/blog/2012/3/20.html

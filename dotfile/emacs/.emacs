@@ -87,6 +87,36 @@
                        (setq color-theme-is-global t)
                        )
           )
+   (:name mcomplete
+          :description "mcomplete"
+          :type http
+          :url "http://homepage1.nifty.com/bmonkey/emacs/elisp/mcomplete.el"
+          :load-path (".")
+          )
+   (:name dabbrev-ja
+          :description "dabbrev-ja"
+          :type http
+          :url "http://namazu.org/~tsuchiya/elisp/dabbrev-ja.el"
+          :load-path (".")
+          )
+   (:name dabbrev-highlight
+          :description "dabbrev-highlight"
+          :type http
+          :url "http://www.namazu.org/~tsuchiya/elisp/dabbrev-highlight.el"
+          :load-path (".")
+          )
+   (:name dmacro
+          :description "dmacro"
+          :type http
+          :url "http://www.pitecan.com/papers/JSSSTDmacro/dmacro.el"
+          :load-path (".")
+          )
+   (:name zlc
+          :description "zlc"
+          :type http
+          :url "http://github.com/mooz/emacs-zlc/raw/master/zlc.el"
+          :load-path (".")
+          )
    )
 )
 (el-get 'sync)
@@ -121,6 +151,9 @@
 (setq hl-line-face 'underline) ; hilighting using under line
 (savehist-mode 1) ; saving history of mini buffer
 (setq recentf-max-saved-items 10000) ; setting length of recent open file list
+(add-to-list 'default-frame-alist '(cursor-color . "SlateGray")) ; change the cursor color
+(iswitchb-mode 1) ;; open muffer list in mini buffer (C-x b)
+
 
 ;; use editable dired (C-x d, select directory and r)
 (require 'wdired)
@@ -148,10 +181,62 @@
 (load "moccur-edit")
 (setq moccur-split-word t)
 
+;; dmacro
+;; http://www.pitecan.com/papers/JSSSTDmacro/dmacro.el
+(defconst *dmacro-key* "\C-p" "repeat key setting")
+(global-set-key *dmacro-key* 'dmacro-exec)
+(el-get 'sync '(dmacro))
+(autoload 'dmacro-exec "dmacro" nil t)
+
+;; zlc
+;; http://d.hatena.ne.jp/mooz/20101003/p1
+(el-get 'sync '(zlc))
+(require 'zlc)
+
+(el-get 'sync '(anything))
+
+; http://namazu.org/~tsuchiya/elisp/dabbrev-ja.el
+(el-get 'sync '(dabbrev-ja))
+(require 'dabbrev)
+(load "dabbrev-ja")
+
+; http://www.namazu.org/~tsuchiya/elisp/dabbrev-highlight.el
+(el-get 'sync '(dabbrev-highlight))
+(require 'dabbrev-highlight)
+
+;(el-get 'sync '(dabbrev-expand-multiple))
+;(require 'dabbrev-expand-multiple)
+;(global-set-key "\M-/" 'dabbrev-expand-multiple)
+;(setq dabbrev-expand-multiple-select-keys '("a" "s" "d" "f" "g"))
+;(add-to-list 'dabbrev-expand-multiple-multi-selection-keys "m")
+;(add-to-list 'dabbrev-expand-multiple-next-keys "n")
+;(add-to-list 'dabbrev-expand-multiple-previous-keys "p")
+;(setq dabbrev-expand-multiple-tooltip-timeout 10)
+;(setq dabbrev-expand-multiple-tooltip-params
+;      '((foreground-color . "grey75")
+;        (background-color . "navy blue")
+;        (border-color . "black")))
+;(setq dabbrev-expand-multiple-highlight-face 'highlight)
+;(setq dabbrev-expand-multiple-inline-show-face nil)
+
 ; Automatic spell checker
 ; http://www.clear-code.com/blog/2012/3/20.html
-(setq-default flyspell-mode t)
-(setq ispell-dictionary "american")
+(setq ispell-program-name "aspell")
+(setq ispell-grep-command "grep")
+(eval-after-load "ispell"
+  '(add-to-list 'ispell-skip-region-alist '("[^\000-\377]")))
+
+;; mini-buffer input complete
+(el-get 'sync '(mcomplete))
+(require 'mcomplete)
+;; http://d.hatena.ne.jp/whitypig/20110726/1311699401
+(turn-on-mcomplete-mode)
+(put 'imenu
+     'mcomplete-mode
+     '(:mode on
+             :method-set (mcomplete-substr-method
+                          mcomplete-prefix-method)
+             :ignore-case on))
 
 ; Allow chmod 755 when you save a script has '#!**' in first line
 ; http://www.clear-code.com/blog/2012/3/20.html
@@ -286,6 +371,20 @@
     )
   )
 
+; makefile mode
+; http://d.hatena.ne.jp/kiki114/20101102/1288675441
+(setq auto-mode-alist
+      (append '(("Makefile\\..*$" . makefile-gmake-mode)
+                ("Makefile_.*$" . makefile-gmake-mode)
+                ) auto-mode-alist))
+(autoload 'c++-mode "makefile-gmake-mode" nil t)
+; remove hook to save \t character
+(eval-after-load "makefile-gmake-mode"
+  '(progn (
+           (remove-hook 'before-save-hook 'delete-trailing-whitespace)
+           )
+          ))
+
 ; C++ mode
 ; http://d.hatena.ne.jp/suztomo/20080905/1220633281
 
@@ -386,30 +485,30 @@
 
      (add-hook 'cperl-mode-hook (lambda ()
                                   ; Set tab width and replace indent tabs to spaces
-;                                  (setq indent-tabs-mode nil)
-;                                  (setq cperl-font-lock t)
-;                                  (cperl-set-style "PerlStyle")
+                                  (setq indent-tabs-mode nil)
+                                  (setq cperl-font-lock t)
+                                  (cperl-set-style "PerlStyle")
 
-;                                  (setq cperl-close-paren-offset -4)
-;                                  (setq cperl-continued-statement-offset 4)
-;                                  (setq cperl-indent-level 4)
-;                                  (setq cperl-indent-parens-as-block t)
-;                                  (setq cperl-tab-always-indent t)
-;                                  (setq cperl-label-offset -4)
-;                                  (setq cperl-highlight-variables-indiscriminately t)
+                                  (setq cperl-close-paren-offset -4)
+                                  (setq cperl-continued-statement-offset 4)
+                                  (setq cperl-indent-level 4)
+                                  (setq cperl-indent-parens-as-block t)
+                                  (setq cperl-tab-always-indent t)
+                                  (setq cperl-label-offset -4)
+                                  (setq cperl-highlight-variables-indiscriminately t)
 
                                   ; http://d.hatena.ne.jp/IMAKADO/20081129/1227893458
-;                                  (el-get 'sync '(perl-completion))
-;                                  (require 'perl-completion)
+                                  (el-get 'sync '(perl-completion))
+                                  (require 'perl-completion)
 
                                   ; http://d.hatena.ne.jp/sugyan/20120103/1325523629
-;                                  (interactive)
+                                  (interactive)
 
-;                                  (defvar ac-source-my-perl-completion
-;                                    '((candidates . plcmp-ac-make-cands)))
-;                                  (add-to-list 'ac-sources 'ac-source-my-perl-completion)
+                                  (defvar ac-source-my-perl-completion
+                                    '((candidates . plcmp-ac-make-cands)))
+                                  (add-to-list 'ac-sources 'ac-source-my-perl-completion)
 
-;                                  (perl-completion-mode t)
+                                  (perl-completion-mode t)
                                   (flymake-perl-load)
                                   ))
      ))

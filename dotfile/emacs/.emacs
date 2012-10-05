@@ -1,5 +1,5 @@
 ;======================================================================
-; @overlast's configure file of Emacs GNU Emacs 23.4.1 or later
+; @overlast's configure file for GNU Emacs 23.4.1 or later
 ;
 ; How to use this .emacs file !?
 ;

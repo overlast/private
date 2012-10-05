@@ -183,7 +183,7 @@
 
 ;; dmacro
 ;; http://www.pitecan.com/papers/JSSSTDmacro/dmacro.el
-(defconst *dmacro-key* "\C-p" "repeat key setting")
+(defconst *dmacro-key* "\C-^" "repeat key setting")
 (global-set-key *dmacro-key* 'dmacro-exec)
 (el-get 'sync '(dmacro))
 (autoload 'dmacro-exec "dmacro" nil t)

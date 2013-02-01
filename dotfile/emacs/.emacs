@@ -19,6 +19,52 @@
 ;
 ;======================================================================
 
+(setq elpa-dir "~/.emacs.d/elpa")
+(add-to-list 'load-path elpa-dir)
+
+(require 'package)
+
+; Add package-archives
+(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
+(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
+
+; Initialize
+(package-initialize)
+
+(require 'cl)
+(defvar installing-package-list
+  '(
+    ;; ここに使っているパッケージを書く。
+    ;auto-save-buffers
+    ;pushy
+    ;dmacro
+    ;moccur-edit
+    anything
+    helm
+    popwin
+    browse-kill-ring
+    auto-complete
+    color-theme
+    melpa
+    wdired
+    session
+    zlc
+    recentf
+    ;direx
+    ))
+(let ((not-installed (loop for x in installing-package-list
+                            when (not (package-installed-p x))
+                            collect x)
+                     ))
+  (when not-installed
+    (package-refresh-contents)
+    (dolist (pkg not-installed)
+      (package-install pkg))
+    (byte-recompile-directory elpa-dir 0)))
+
+; melpa.el
+(require 'melpa)
+
 ;======================================================================
 ; control the messages of byte-compile-warnings
 ; http://d.hatena.ne.jp/kitokitoki/20100425/p1
@@ -45,22 +91,10 @@
           :url "http://0xcc.net/misc/auto-save/auto-save-buffers.el"
           :load-path (".")
           )
-   (:name minibuf-isearch
-          :description "minibuf-isearch: Incremental search for mini buffer."
-          :type http
-          :url "http://www.sodan.org/~knagano/emacs/minibuf-isearch/minibuf-isearch.el"
-          :load-path (".")
-          )
    (:name set-perl5lib
           :description "set-perl5lib"
           :type http
           :url "http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el"
-          :load-path (".")
-          )
-   (:name perlbrew
-          :description "perlbrew"
-          :type git
-          :url "https://github.com/kentaro/perlbrew.el.git"
           :load-path (".")
           )
    (:name perlbrew-mini
@@ -69,28 +103,10 @@
           :url "git://github.com/dams/perlbrew-mini.el.git"
           :load-path (".")
           )
-   (:name fm
-          :description "fm"
-          :type http
-          :url "http://www.anc.ed.ac.uk/~stephen/emacs/fm.el"
-          :load-path (".")
-          )
-   (:name color-theme-mirror
-          :description "An Emacs-Lisp package with more than 50 color themes for your use. For questions about color-theme"
-          :type http-tar
-          :options ("xfz")
-          :url "http://mirror.yongbok.net/nongnu/color-theme/color-theme-6.6.0.tar.gz"
-          :load "color-theme.el"
-          :features "color-theme"
-          :post-init (lambda ()
-                       (color-theme-initialize)
-                       (setq color-theme-is-global t)
-                       )
-          )
-   (:name mcomplete
-          :description "mcomplete"
-          :type http
-          :url "http://homepage1.nifty.com/bmonkey/emacs/elisp/mcomplete.el"
+   (:name direx
+          :description "direx"
+          :type git
+          :url "git://github.com/m2ym/direx-el.git"
           :load-path (".")
           )
    (:name dabbrev-ja
@@ -109,12 +125,6 @@
           :description "dmacro"
           :type http
           :url "http://www.pitecan.com/papers/JSSSTDmacro/dmacro.el"
-          :load-path (".")
-          )
-   (:name zlc
-          :description "zlc"
-          :type http
-          :url "http://github.com/mooz/emacs-zlc/raw/master/zlc.el"
           :load-path (".")
           )
    )
@@ -153,21 +163,13 @@
 (setq recentf-max-saved-items 10000) ; setting length of recent open file list
 (add-to-list 'default-frame-alist '(cursor-color . "SlateGray")) ; change the cursor color
 (iswitchb-mode 1) ;; open muffer list in mini buffer (C-x b)
+(global-auto-revert-mode 1) ;; revert file when a file is change in other buffer
 
-
-;; use editable dired (C-x d, select directory and r)
-(require 'wdired)
-(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)
-
-;; show a contents of a selected file in other buffer
-;; http://www.bookshelf.jp/soft/meadow_47.html#SEC696
-;(el-get 'sync '(fm))
-;(require 'fm)
-;(add-hook 'occur-mode-hook 'fm-start)
-;(add-hook 'compilation-mode-hook 'fm-start)
-
+;======================================================================
 ;; use ultra rich occur
 ;; http://www.bookshelf.jp/soft/meadow_50.html#SEC746
+;======================================================================
+
 (el-get 'sync '(color-moccur))
 (require 'color-moccur)
 ;; http://d.hatena.ne.jp/higepon/20060222/1140579843
@@ -175,92 +177,163 @@
 (setq *moccur-buffer-name-exclusion-list*
       '("\.svn" "\.git" "*Completions*" "*Messages*"))
 
+;======================================================================
 ;; use editable search result of moccur
 ;; http://www.bookshelf.jp/soft/meadow_50.html#SEC769
+;======================================================================
+
 (el-get 'sync '(moccur-edit))
 (load "moccur-edit")
 (setq moccur-split-word t)
 
+;======================================================================
 ;; dmacro
 ;; http://www.pitecan.com/papers/JSSSTDmacro/dmacro.el
+;======================================================================
+
 (defconst *dmacro-key* "\C-^" "repeat key setting")
 (global-set-key *dmacro-key* 'dmacro-exec)
 (el-get 'sync '(dmacro))
 (autoload 'dmacro-exec "dmacro" nil t)
 
+;======================================================================
 ;; zlc
 ;; http://d.hatena.ne.jp/mooz/20101003/p1
-(el-get 'sync '(zlc))
+;======================================================================
+
 (require 'zlc)
+(setq zlc-select-completion-immediately t)
+(let ((map minibuffer-local-map))
+  ;;; like menu select
+  (define-key map (kbd "<down>")  'zlc-select-next-vertical)
+  (define-key map (kbd "<up>")    'zlc-select-previous-vertical)
+  (define-key map (kbd "<right>") 'zlc-select-next)
+  (define-key map (kbd "<left>")  'zlc-select-previous)
+  ;;; reset selection
+  (define-key global-map "\C-c" 'zlc-reset)
+  )
 
-(el-get 'sync '(anything))
+;======================================================================
+;; http://namazu.org/~tsuchiya/elisp/dabbrev-ja.el
+;======================================================================
 
-; http://namazu.org/~tsuchiya/elisp/dabbrev-ja.el
 (el-get 'sync '(dabbrev-ja))
 (require 'dabbrev)
 (load "dabbrev-ja")
 
-; http://www.namazu.org/~tsuchiya/elisp/dabbrev-highlight.el
+;======================================================================
+;; http://www.namazu.org/~tsuchiya/elisp/dabbrev-highlight.el
+;======================================================================
+
 (el-get 'sync '(dabbrev-highlight))
 (require 'dabbrev-highlight)
 
-;(el-get 'sync '(dabbrev-expand-multiple))
-;(require 'dabbrev-expand-multiple)
-;(global-set-key "\M-/" 'dabbrev-expand-multiple)
-;(setq dabbrev-expand-multiple-select-keys '("a" "s" "d" "f" "g"))
-;(add-to-list 'dabbrev-expand-multiple-multi-selection-keys "m")
-;(add-to-list 'dabbrev-expand-multiple-next-keys "n")
-;(add-to-list 'dabbrev-expand-multiple-previous-keys "p")
-;(setq dabbrev-expand-multiple-tooltip-timeout 10)
-;(setq dabbrev-expand-multiple-tooltip-params
-;      '((foreground-color . "grey75")
-;        (background-color . "navy blue")
-;        (border-color . "black")))
-;(setq dabbrev-expand-multiple-highlight-face 'highlight)
-;(setq dabbrev-expand-multiple-inline-show-face nil)
-
+;======================================================================
 ; Automatic spell checker
-; http://www.clear-code.com/blog/2012/3/20.html
+; http://www.clear-code.com/blog/2012/3/20.htm
+;======================================================================
+
 (setq ispell-program-name "aspell")
 (setq ispell-grep-command "grep")
 (eval-after-load "ispell"
   '(add-to-list 'ispell-skip-region-alist '("[^\000-\377]")))
 
-;; mini-buffer input complete
-(el-get 'sync '(mcomplete))
-(require 'mcomplete)
-;; http://d.hatena.ne.jp/whitypig/20110726/1311699401
-(turn-on-mcomplete-mode)
-(put 'imenu
-     'mcomplete-mode
-     '(:mode on
-             :method-set (mcomplete-substr-method
-                          mcomplete-prefix-method)
-             :ignore-case on))
-
+;======================================================================
 ; Allow chmod 755 when you save a script has '#!**' in first line
 ; http://www.clear-code.com/blog/2012/3/20.html
+;======================================================================
+
 (add-hook 'after-save-hook
           'executable-make-buffer-file-executable-if-script-p)
 
+;======================================================================
 ; Adding directory name if there are some filenames which have same name.
 ; http://www.clear-code.com/blog/2012/3/20.html
+;======================================================================
+
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
 
+;======================================================================
 ; Color Setting
 ; http://gnuemacscolorthemetest.googlecode.com/svn/html/index-c.htm
-(el-get 'sync '(color-theme-mirror))
+;======================================================================
+
+
 (require 'color-theme)
-(color-theme-dark-laptop)
+(color-theme-initialize)
+(color-theme-hober)
+
+;======================================================================
+; helm
+; http://d.hatena.ne.jp/rubikitch/20100718/anything
+;======================================================================
+
+(require 'helm-config)
+(setq helm-idle-delay             0.1
+      helm-input-idle-delay       0.3
+      helm-candidate-number-limit 100)
+(when (require 'helm-config nil t)
+  (global-set-key (kbd "C-x b") 'helm-buffers-list)
+  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+  (helm-mode 1)
+  (helm-dired-bindings 1)
+)
+
+;======================================================================
+; recent.el
+;======================================================================
+
+(require 'recentf)
+(recentf-mode 1)
+(define-key global-map "\C-x @" 'helm-recentf)
+
+;======================================================================
+; wdired
+; rでdiredがそのまま編集できる
+;======================================================================
+
+(require 'wdired)
+(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)
+
+;======================================================================
+; direx
+; http://cx4a.blogspot.jp/2011/12/popwineldirexel.html
+;======================================================================
+
+(el-get 'sync '(direx))
+(require 'direx)
+(global-set-key (kbd "C-x C-j") 'direx:jump-to-directory-other-window)
+;(global-set-key (kbd "C-x C-j") 'direx:jump-to-directory)
+
+;======================================================================
+; popwin.el
+; http://d.hatena.ne.jp/m2ym/20110120/1295524932
+; http://d.hatena.ne.jp/hirose31/20110302/1299062869
+;======================================================================
+
+(setq pop-up-windows nil)
+(require 'popwin nil t)
+(when (require 'popwin nil t)
+  (setq anything-samewindow nil)
+  (setq display-buffer-function 'popwin:display-buffer)
+  (push '("anything" :regexp t :height 0.5) popwin:special-display-config)
+  (push '("helm" :regexp t :height 0.5) popwin:special-display-config)
+  (push '("*Completions*" :height 0.4) popwin:special-display-config)
+  (push '("*compilation*" :height 0.4 :noselect t :stick t) popwin:special-display-config)
+  (push '("*Kill Ring*" :height 0.4) popwin:special-display-config)
+  (push '("*Help*" :height 0.4) popwin:special-display-config)
+  (push '("*Compile-Log*" :height 10 :noselect t) popwin:special-display-config)
+  )
 
 ;======================================================================
 ; browse-kill-ring
 ; http://www.yumi-chan.com/emacs/emacs_el_medium.html
 ;======================================================================
+
 (el-get 'sync '(browse-kill-ring))
 (require 'browse-kill-ring)
-(global-set-key "\M-y" 'browse-kill-ring)
+;(global-set-key "\M-y" 'browse-kill-ring)
 (make-face 'separator)
 (set-face-bold-p 'separator t)
 (setq browse-kill-ring-separator "--------------------------------"
@@ -279,32 +352,34 @@
 ; http://0xcc.net/unimag/3/
 ;======================================================================
 
-(el-get 'sync '(session))
 (require 'session)
-(add-hook 'after-init-hook 'session-initialize)
 (when (require 'session nil t)
+  (add-hook 'after-init-hook 'session-initialize)
   (setq session-initialize '(de-saveplace session keys menus places)
         session-globals-include '((kill-ring 50)
-                                  (session-file-alist 500 t)
-                                  (file-name-history 10000)
-                                  )
-        )
-  (add-hook 'after-init-hook 'session-initialize)
+                                    (session-file-alist 500 t)
+                                      (file-name-history 10000)))
+  (setq session-globals-max-string 100000000)
+  (setq history-length t)
   (setq session-undo-check -1) ; Redume cursor position when you close the file.
-  )
+)
+;; http://sakito.jp/moin/moin.cgi/session.el
+;; kill-ring 内の重複を排除する
+(defadvice kill-new (before ys:no-kill-new-duplicates activate)
+  (setq kill-ring (delete (ad-get-arg 0) kill-ring)))
 
-;======================================================================
-; Setting about languages and charactor encodings
-;======================================================================
-;(require 'un-define)
-;(set-language-environment "Japanese")
-;(set-terminal-coding-system 'utf-8)
-;(set-keyboard-coding-system 'utf-8)
-;(set-buffer-file-coding-system 'utf-8)
-;(setq default-buffer-file-coding-system 'utf-8)
-;(prefer-coding-system 'utf-8)
-;(set-default-coding-systems 'utf-8)
-;(setq file-name-coding-system 'utf-8)
+;;======================================================================
+;; Setting about languages and charactor encodings
+;;======================================================================
+;;(require 'un-define)
+;;(set-language-environment "Japanese")
+;;(set-terminal-coding-system 'utf-8)
+;;(set-keyboard-coding-system 'utf-8)
+;;(set-buffer-file-coding-system 'utf-8)
+;;(setq default-buffer-file-coding-system 'utf-8)
+;;(prefer-coding-system 'utf-8)
+;;(set-default-coding-systems 'utf-8)
+;;(setq file-name-coding-system 'utf-8)
 
 ;======================================================================
 ; auto-save-buffers
@@ -316,22 +391,32 @@
 (run-with-idle-timer 5 t 'auto-save-buffers)
 
 ;======================================================================
-; minibuff-isearch
-; http://www.sodan.org/~knagano/emacs/minibuf-isearch/
+; Pushy
 ;======================================================================
 
-(el-get 'sync '(minibuf-isearch))
-(require 'minibuf-isearch nil t)
+(el-get 'sync '(pushy))
+(require 'pushy)
+(setq pushy-keys
+      (list (cons (kbd "C-<return>") 'pushy-insert-item)    ; 候補を入力
+            ;; (cons (kbd "<ESC>") 'pushy-cleanup)  ; 通常の補完ができなくなるのでいらん
+            (cons (kbd "C-<up>") 'pushy-previous-line)
+            (cons (kbd "C-<down>") 'pushy-next-line)
+            (cons (kbd "C-<prior>") 'pushy-previous-page)
+            (cons (kbd "C-<next>") 'pushy-next-page)))
+(setq pushy-enable-globally nil)
+(put 'eval-expression 'pushy-completion 'enabled)
+(put 'shell-command 'pushy-completion 'enabled)
+(put 'shell-command-on-region 'pushy-completion 'enabled)
+(pushy-mode 1)
 
 ;======================================================================
 ; Auto Complete Mode
 ; http://cx4a.org/software/auto-complete/manual.ja.html
 ;======================================================================
 
-(el-get 'sync '(auto-complete))
+(require 'auto-complete-config)
 (add-to-list 'ac-dictionary-directories "~/.emacs.d/dict")
 (require 'auto-complete)
-(require 'auto-complete-config)
 (ac-config-default)
 
 ;======================================================================
@@ -403,10 +488,10 @@
      (push '("\\.cc$" flymake-cc-init) flymake-allowed-file-name-masks)
      (add-hook 'c++-mode-hook
                '(lambda ()
-                  (setq-default tab-width 2 indent-tabs-mode nil) ; Set tab width and replace indent tabs to spaces
-                  (define-key c++-mode-map "\C-cd" 'flymake-display-err-minibuf)
+                  (setq-default tab-width 2 indent-tabs-mode nil) ; Set tab width and replace indent tabsto spaces
+                  (define-key c++-mode-map "\C-c d" 'flymake-display-err-minibuf)
                   (c-toggle-auto-hungry-state 1) ; inserting newline and indent when you push ';'
-                  (define-key c-mode-base-map "\C-m" 'newline-and-indent) ; inserting newline and indent when you push '\n'
+                  (define-key c-mode-base-map "\C-m" 'newline-and-indent) ; inserting newline and indent hen you push '\n'
                   (flymake-mode t)
                   ))
      ))
@@ -426,10 +511,10 @@
      (push '("\\.c$" flymake-c-init) flymake-allowed-file-name-masks)
      (add-hook 'c-mode-hook
                '(lambda ()
-                  (setq-default tab-width 2 indent-tabs-mode nil) ; Set tab width and replace indent tabs to spaces
-                  (define-key c-mode-map "\C-cd" 'flymake-display-err-minibuf)
+                  (setq-default tab-width 2 indent-tabs-mode nil) ; Set tab width and replace indent tabsto spaces
+                  (define-key c-mode-map "\C-c d" 'flymake-display-err-minibuf)
                   (c-toggle-auto-hungry-state 1) ; inserting newline and indent when you push ';'
-                  (define-key c-mode-base-map "\C-m" 'newline-and-indent) ; inserting newline and indent when you push '\n'
+                  (define-key c-mode-base-map "\C-m" 'newline-and-indent) ; inserting newline and indent hen you push '\n'
                   (flymake-mode t)
                   ))
      ))
@@ -451,7 +536,8 @@
      ; https://github.com/dams/perlbrew-mini.el
      (el-get 'sync '(perlbrew-mini))
      (require 'perlbrew-mini)
-     (perlbrew-mini-use "perl-5.16.1")
+     ;(perlbrew-mini-use-latest)
+     (perlbrew-mini-use "perl-5.16.2")
 
      ; http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el
      (el-get 'sync '(set-perl5lib))
@@ -461,7 +547,6 @@
        '(("\\(.*\\) at \\([^ \n]+\\) line \\([0-9]+\\)[,.\n]" 2 3 nil 1)))
      (defconst flymake-allowed-perl-file-name-masks
        '("\\([Pp][Llm]\\|cgi\\|t\\|psgi\\)$" flymake-perl-init))
-
      (defun flymake-perl-init ()
        (let* ((temp-file (flymake-init-create-temp-buffer-copy
                           'flymake-create-temp-inplace))
@@ -512,7 +597,6 @@
                                   (flymake-perl-load)
                                   ))
      ))
-
 
 ;; emacs-lisp-mode
 (add-hook

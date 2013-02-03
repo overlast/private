@@ -50,6 +50,7 @@
     session
     zlc
     recentf
+    flyspell
     ;direx
     ))
 (let ((not-installed (loop for x in installing-package-list
@@ -604,3 +605,21 @@
  (lambda ()
    (setq-default tab-width 2 indent-tabs-mode nil) ; Set tab width and replace indent tabs to spaces
    ))
+
+;======================================================================
+; Flyspell
+;======================================================================
+
+;;; activate Flyspell for all input
+(defun flyspell-mode-hooks ()
+   (flyspell-mode))
+(add-hook 'changelog-mode-hook 'flyspell-mode-hooks)
+(add-hook 'text-mode-hook 'flyspell-mode-hooks)
+(add-hook 'latex-lisp-common-hook 'flyspell-mode-hooks)
+
+;;; activate Flyspell for comment
+(defun flyspell-prog-mode-hooks ()
+   (flyspell-prog-mode))
+(add-hook 'c-mode-common-hook 'flyspell-prog-mode-hooks)
+(add-hook 'cperl-mode-hook 'flyspell-prog-mode-hooks)
+(add-hook 'emacs-lisp-common-hook 'flyspell-prog-mode-hooks)

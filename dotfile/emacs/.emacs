@@ -39,6 +39,7 @@
     ;pushy
     ;dmacro
     ;moccur-edit
+    recentf-ext
     anything
     helm
     popwin
@@ -287,7 +288,16 @@
 
 (require 'recentf)
 (recentf-mode 1)
-(define-key global-map "\C-x @" 'helm-recentf)
+(setq recentf-max-menu-items 20)
+(setq recentf-max-saved-items 100)
+(define-key global-map "\C-x@" 'helm-recentf)
+
+;======================================================================
+; recentf-ext.el
+; http://d.hatena.ne.jp/rubikitch/20091224/recentf
+;======================================================================
+
+(require 'recentf-ext)
 
 ;======================================================================
 ; wdired

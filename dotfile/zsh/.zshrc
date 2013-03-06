@@ -19,8 +19,8 @@ autoload -U colors
 colors
 
 # デフォルトの補完機能を有効
-autoload -U compinit
-compinit
+# cd f/b/b[TAB]でcd foooo/barrr/bazzzと展開される
+autoload -U compinit && compinit
 
 # カレントディレクトリに候補がない場合のみ cdpath 上のディレクトリを候補
 zstyle ':completion:*:cd:*' tag-order local-directories path-directories
@@ -189,6 +189,10 @@ alias bd2='popd -2'
 alias bd3='popd -3'
 
 alias screen='screen -U'
+
+# http://qiita.com/items/7916037b1384d253b457
+# 今いるディレクトリを補完候補から外す
+zstyle ':completion:*' ignore-parents parent pwd ..
 
 # dump用のpモジュールをつかう
 #export PERL5OPT=-MP

@@ -52,6 +52,7 @@
     zlc
     recentf
     flyspell
+    git-gutter
     ;direx
     ))
 (let ((not-installed (loop for x in installing-package-list
@@ -272,15 +273,21 @@
 ;======================================================================
 
 (require 'helm-config)
-(setq helm-idle-delay             0.1
-      helm-input-idle-delay       0.3
+(setq helm-idle-delay             0.05
+      helm-input-idle-delay       0.1
       helm-candidate-number-limit 100)
+(helm-mode 1)
 (when (require 'helm-config nil t)
   (global-set-key (kbd "C-x b") 'helm-buffers-list)
   (global-set-key (kbd "M-y") 'helm-show-kill-ring)
-  (helm-mode 1)
-  (helm-dired-bindings 1)
+;  (helm-dired-bindings 1)
 )
+;; 自動補完を無効
+(custom-set-variables '(helm-ff-auto-update-initial-value nil))
+;; C-hでバックスペースと同じように文字を削除
+(define-key helm-c-read-file-map (kbd "C-h") 'delete-backward-char)
+;; TABで任意補完。選択肢が出てきたらC-nやC-pで上下移動してから決定することも可能
+(define-key helm-c-read-file-map (kbd "TAB") 'helm-execute-persistent-action)
 
 ;======================================================================
 ; recent.el

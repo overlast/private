@@ -7,7 +7,8 @@ export FIGNORE='~:.aux:.o'
 export EDITOR=/usr/bin/jed
 export SED=sed
 export PERL_BADLANG=0
-
+export TERM="screen-256color"
+alias tmux="tmux -2"
 # ファイル作成マスク
 umask 002
 
@@ -21,6 +22,13 @@ colors
 # デフォルトの補完機能を有効
 # cd f/b/b[TAB]でcd foooo/barrr/bazzzと展開される
 autoload -U compinit && compinit
+
+# http://news.mynavi.jp/column/zsh/005/index.html
+setopt auto_cd
+setopt auto_pushd
+#setopt correct
+setopt list_packed
+setopt nolistbeep
 
 # カレントディレクトリに候補がない場合のみ cdpath 上のディレクトリを候補
 zstyle ':completion:*:cd:*' tag-order local-directories path-directories
@@ -47,9 +55,38 @@ limit   coredumpsize    0
 
 # プロンプトの設定
 unsetopt promptcr # 改行のない出力をプロンプトで上書きするのを防ぐ
-setopt PROMPT_SUBST  # ESCエスケープを有効にする
+setopt prompt_subst  # ESCエスケープを有効にする
+
+# http://d.hatena.ne.jp/uasi/20091017/1255712789
 PROMPT='[%n@]%(!.#.$)'
-RPROMPT='[%(5~,%-2~/.../%2~,%~)%#]'
+#RPROMPT='[%(5~,%-2~/.../%2~,%~)%#]'
+
+function rprompt-git-current-branch {
+    local name st color
+
+    if [[ "$PWD" =~ '/\.git(/.*)?$' ]]; then
+        return
+    fi
+    name=$(basename "`git symbolic-ref HEAD 2> /dev/null`")
+    if [[ -z $name ]]; then
+        return
+    fi
+    st=`git status 2> /dev/null`
+    if [[ -n `echo "$st" | grep "^nothing to"` ]]; then
+        color=${fg[green]}
+    elif [[ -n `echo "$st" | grep "^nothing added"` ]]; then
+        color=${fg[yellow]}
+    elif [[ -n `echo "$st" | grep "^# Untracked"` ]]; then
+        color=${fg_bold[red]}
+    else
+        color=${fg[red]}
+    fi
+    # %{...%} は囲まれた文字列がエスケープシーケンスであることを明示する
+    # これをしないと右プロンプトの位置がずれる
+    echo "%{$color%}$name%{$reset_color%} "
+}
+
+RPROMPT='[`rprompt-git-current-branch`%(5~,%-2~/.../%2~,%~)%#]'
 
 #コマンドが上手く表示されないときは
 #Emacsの場合はctrl+qしてescを押すと「」と出るので
@@ -150,6 +187,9 @@ function psg() {
     ps ax | grep $* | grep -v "ps -auxww" | grep -v grep # grep プロセスを除外
 }
 
+# cdしたらls
+function chpwd() { ls -F }
+
 #引数の検索ワードで google 検索。日本語可。
 function google() {
   local str opt
@@ -165,7 +205,7 @@ function google() {
   # mozilla -remote openURL\(http::/www.google.co.jp/$opt\) # 未テスト
 }
 alias ggl=google
-alias emacs="TERM=xterm-256color emacs -nw"
+alias emacs="TERM=screen-256color emacs -nw"
 alias javac='javac -J-Dfile.encoding=UTF-8'
 alias java='java -Dfile.encoding=UTF-8'
 

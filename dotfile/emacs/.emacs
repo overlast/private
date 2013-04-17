@@ -53,6 +53,8 @@
     recentf
     flyspell
     git-gutter
+    git-gutter-fringe
+    color-theme-solarized
     ;direx
     ))
 (let ((not-installed (loop for x in installing-package-list
@@ -259,13 +261,25 @@
 
 ;======================================================================
 ; Color Setting
-; http://gnuemacscolorthemetest.googlecode.com/svn/html/index-c.htm
+; http://gnuemacscolorthemetest.googlecode.com/svn/html/index-c.html
 ;======================================================================
-
 
 (require 'color-theme)
 (color-theme-initialize)
-(color-theme-hober)
+(color-theme-solarized-dark)
+
+;======================================================================
+; git-gutter-fringe.el
+; https://github.com/syohex/emacs-git-gutter-fringe
+; http://emacs-jp.github.io/packages/vcs/git-gutter.html
+;======================================================================
+
+;; You need to install fringe-helper.el
+;;(require 'git-gutter-fringe)
+(global-git-gutter-mode t)
+;; delete window-configuration-change-hook
+(setq git-gutter:update-hooks '(after-save-hook after-revert-hook))
+
 
 ;======================================================================
 ; helm

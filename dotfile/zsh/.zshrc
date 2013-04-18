@@ -61,7 +61,7 @@ setopt prompt_subst  # ESCエスケープを有効にする
 PROMPT='[%n@]%(!.#.$)'
 #RPROMPT='[%(5~,%-2~/.../%2~,%~)%#]'
 
-function rprompt-git-current-branch {
+function rprompt-git-current-branch-status {
     local name st color
     if [[ "$PWD" =~ '/\.git(/.*)?$' ]]; then
         return
@@ -90,7 +90,7 @@ function rprompt-git-current-branch {
     # これをしないと右プロンプトの位置がずれる
     echo "%{$color%}$name%{$reset_color%} "
 }
-RPROMPT='[`rprompt-git-current-branch`%(5~,%-2~/.../%2~,%~)%#]'
+RPROMPT='[`rprompt-git-current-branch-status`%(5~,%-2~/.../%2~,%~)%#]'
 
 #コマンドが上手く表示されないときは
 #Emacsの場合はctrl+qしてescを押すと「」と出るので

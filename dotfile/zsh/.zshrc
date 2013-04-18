@@ -70,8 +70,10 @@ function rprompt-git-current-branch {
     if [[ -z $name ]]; then
         return
     fi
-    st=`git status`
-    if [[ -n `echo "$st" | grep "^nothing to"` ]]; then
+    st=`perl -e 'alarm(1); system("git status");'`
+    if [[ $st = '' ]]; then
+        color=${fg[blue]}
+    elif [[ -n `echo "$st" | grep "^nothing to"` ]]; then
         color=${fg[green]}
     elif [[ -n `echo "$st" |perl -ne '@a; while($i=<STDIN>) {push @a, $i;}; $t = join "", @a; if ($t =~ m|Changes not staged for commit.+?# *\n# *(.+?)\n# *\n# *|ms) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t; }}' | grep "/"` ]]; then
         color=${fg_bold[red]}

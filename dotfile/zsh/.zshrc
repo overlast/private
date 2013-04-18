@@ -78,9 +78,9 @@ function rprompt-git-current-branch {
     elif [[ -n `echo "$st" |perl -ne '@a; while($i=<STDIN>) {push @a, $i;}; $t = join "", @a; if ($t =~ m|Changes not staged for commit.+?# *\n# *(.+?)\n# *\n# *|ms) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t; }}' | grep "/"` ]]; then
         color=${fg_bold[red]}
     elif [[ -n `echo "$st" | grep "Your branch is ahead of"` ]]; then
-        color=${fg[blue]}
-    elif [[ -n `echo "$st" | grep "Changes to be committed"` ]]; then
         color=${fg[cyan]}
+    elif [[ -n `echo "$st" | grep "Changes to be committed"` ]]; then
+        color=${fg[blue]}
     elif [[ -n `echo "$st" |perl -ne '@a; while($i=<STDIN>) {push @a, $i;}; $t = join "", @a; if ($t =~ m|Untracked files.+?to include in what will be committed.+?\n#(.+)#|ms) { $t = $1; @ua = split /\n/, $t; foreach my $u (@ua) { unless ($u =~ m|[.]{1,}/{1}|) { print $u; }}}' | grep "/"` ]]; then
         color=${fg[yellow]}
     else

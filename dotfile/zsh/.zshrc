@@ -63,7 +63,6 @@ PROMPT='[%n@]%(!.#.$)'
 
 function rprompt-git-current-branch {
     local name st color
-
     if [[ "$PWD" =~ '/\.git(/.*)?$' ]]; then
         return
     fi
@@ -71,21 +70,20 @@ function rprompt-git-current-branch {
     if [[ -z $name ]]; then
         return
     fi
-    st=`git status 2> /dev/null`
+    st=`git status`
     if [[ -n `echo "$st" | grep "^nothing to"` ]]; then
         color=${fg[green]}
-    elif [[ -n `echo "$st" | grep "^nothing added"` ]]; then
-        color=${fg[yellow]}
-    elif [[ -n `echo "$st" | grep "^# Untracked"` ]]; then
+    elif [[ -n `echo "$st" |perl -ne '@a; while($i=<STDIN>) {push @a, $i;}; $t = join "", @a; if ($t =~ m|Changes not staged for commit.+?# *\n# *(.+?)\n# *\n# *|ms) { $t = $1;} $reg = "(?: ../)"; unless ($t =~ m|$reg|) { print $t; }'` ]]; then
         color=${fg_bold[red]}
+    elif [[ -n `echo "$st" |perl -ne '@a; while($i=<STDIN>) {push @a, $i;}; $t = join "", @a; if ($t =~ m|# Untracked.+?# *\n# *(.+)\n# *|ms) { $t = $1;} $reg = "(?:../)"; @ua = split /\n/, $t; foreach my $u (@ua) { unless ($u =~ m|$reg|) { print $u; }}'` ]]; then
+        color=${fg[yellow]}
     else
-        color=${fg[red]}
+        color=${fg[green]}
     fi
     # %{...%} は囲まれた文字列がエスケープシーケンスであることを明示する
     # これをしないと右プロンプトの位置がずれる
     echo "%{$color%}$name%{$reset_color%} "
 }
-
 RPROMPT='[`rprompt-git-current-branch`%(5~,%-2~/.../%2~,%~)%#]'
 
 #コマンドが上手く表示されないときは

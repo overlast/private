@@ -70,12 +70,13 @@ function rprompt-git-current-branch {
     if [[ -z $name ]]; then
         return
     fi
-    st=`git status`#Your branch is ahead of 'origin/master' by 1 commit #Changes to be committed:
+    st=`git status`
+#Your branch is ahead of 'origin/master' by 1 commit #Changes to be committed:
     if [[ -n `echo "$st" | grep "^nothing to"` ]]; then
         color=${fg[green]}
-    elif [[ -n `echo "$st" |perl -ne '@a; while($i=<STDIN>) {push @a, $i;}; $t = join "", @a; if ($t =~ m|Changes not staged for commit.+?# *\n# *(.+?)\n# *\n# *|ms) { $t = $1;} $reg = "(?: ../)"; unless ($t =~ m|$reg|) { print $t; }' | grep "/"` ]]; then
+    elif [[ -n `echo "$st" |perl -ne '@a; while($i=<STDIN>) {push @a, $i;}; $t = join "", @a; if ($t =~ m|Changes not staged for commit.+?# *\n# *(.+?)\n# *\n# *|ms) { $t = $1; $reg = "(?: ../)"; unless ($t =~ m|$reg|) { print $t; }}' | grep "/"` ]]; then
         color=${fg_bold[red]}
-    elif [[ -n `echo "$st" |perl -ne '@a; while($i=<STDIN>) {push @a, $i;}; $t = join "", @a; if ($t =~ m|# Untracked.+?# *\n# *(.+)\n# *|ms) { $t = $1;} $reg = "(?:../)"; @ua = split /\n/, $t; foreach my $u (@ua) { unless ($u =~ m|$reg|) { print $u; }}' | grep "/"` ]]; then
+    elif [[ -n `echo "$st" |perl -ne '@a; while($i=<STDIN>) {push @a, $i;}; $t = join "", @a; if ($t =~ m|# Untracked.+?# *\n# *(.+)\n# *|ms) { $t = $1; $reg = "(?:../)"; @ua = split /\n/, $t; foreach my $u (@ua) { unless ($u =~ m|$reg|) { print $u; }}}' | grep "/"` ]]; then
         color=${fg[yellow]}
     else
         color=${fg[green]}

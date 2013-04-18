@@ -49,7 +49,7 @@
     melpa
     wdired
     session
-    zlc
+;    zlc
     recentf
     flyspell
     git-gutter
@@ -206,17 +206,17 @@
 ;; http://d.hatena.ne.jp/mooz/20101003/p1
 ;======================================================================
 
-(require 'zlc)
-(setq zlc-select-completion-immediately t)
-(let ((map minibuffer-local-map))
-  ;;; like menu select
-  (define-key map (kbd "<down>")  'zlc-select-next-vertical)
-  (define-key map (kbd "<up>")    'zlc-select-previous-vertical)
-  (define-key map (kbd "<right>") 'zlc-select-next)
-  (define-key map (kbd "<left>")  'zlc-select-previous)
-  ;;; reset selection
-  (define-key global-map "\C-c" 'zlc-reset)
-  )
+;(require 'zlc)
+;(setq zlc-select-completion-immediately t)
+;(let ((map minibuffer-local-map))
+;  ;;; like menu select
+;  (define-key map (kbd "<down>")  'zlc-select-next-vertical)
+;  (define-key map (kbd "<up>")    'zlc-select-previous-vertical)
+;  (define-key map (kbd "<right>") 'zlc-select-next)
+;  (define-key map (kbd "<left>")  'zlc-select-previous)
+;  ;;; reset selection
+;  (define-key global-map "\C-c" 'zlc-reset)
+;  )
 
 ;======================================================================
 ;; http://namazu.org/~tsuchiya/elisp/dabbrev-ja.el

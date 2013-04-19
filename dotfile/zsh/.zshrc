@@ -60,7 +60,6 @@ setopt prompt_subst  # ESCエスケープを有効にする
 # http://d.hatena.ne.jp/uasi/20091017/1255712789
 PROMPT='[%n@]%(!.#.$)'
 #RPROMPT='[%(5~,%-2~/.../%2~,%~)%#]'
-
 function rprompt-git-current-branch-status {
     local name st color
     if [[ "$PWD" =~ '/\.git(/.*)?$' ]]; then

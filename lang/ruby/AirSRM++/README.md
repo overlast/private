@@ -15,9 +15,10 @@ ruby AirSRM++.rb --srm=525 --divivision=2 --level=1 --all
 * 雛形コードの生成（[FileEdit.jar](http://community.topcoder.com/contest/classes/FileEdit/FileEdit.htm)プラグイン形式に準拠）
 * システムテストで使用されるパラメータのダウンロード
 * システムテスト実行コードの生成
-* MatchEditorials をダウンロード
+* MatchEditorials をダウンロード(problem ディレクトリ以下に出力します)
 
 を一度に行います。
+
 
 ruby AirSRM++.rbを実行する前に
 

@@ -1,0 +1,4 @@
+username = username
+password = passwd
+division = 2      # 1 or 2
+language = cpp   # java, cs, cpp

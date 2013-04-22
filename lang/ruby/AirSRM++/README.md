@@ -7,7 +7,7 @@
 
 です。
 
-ruby AirSRM.rb --srm=525 --divivision=2 --level=1 --all
+ruby AirSRM++.rb --srm=525 --divivision=2 --level=1 --all
 
 というコマンドによって
 
@@ -18,6 +18,12 @@ ruby AirSRM.rb --srm=525 --divivision=2 --level=1 --all
 * MatchEditorials をダウンロード
 
 を一度に行います。
+
+ruby AirSRM++.rbを実行する前に
+
+cp AirSRM++.config.sample AirSRM++.config
+
+して、AirSRM++.config を適時変更して下さい。
 
 以下はオリジナルのReadme.mdです。
 ====

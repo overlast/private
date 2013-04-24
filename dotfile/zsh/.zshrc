@@ -69,21 +69,22 @@ function rprompt-git-current-branch-status {
     if [[ -z $name ]]; then
         return
     fi
-    st=`perl -e 'alarm(1); system("git status");'`
-    if [[ $st = '' ]]; then
+
+    st=`perl -e 'eval { local $SIG{ALRM} = sub {die}; alarm(1); system("git status -s"); }; if ($@) { print "timeout\n"; }'`
+    if [[ -n `echo "$st" | grep "timeout" `  ]]; then
         color=${fg[magenta]}
-    elif [[ -n `echo "$st" | grep "^nothing to"` ]]; then
+    elif [[ $st = '' ]]; then
         color=${fg[green]}
-    elif [[ -n `echo "$st" | perl -ne '@a; while($i=<STDIN>) {push @a, $i;}; $t = join "", @a; if ($t =~ m|^# Change.+?# *\n# *(.+?)\n# *\n# *|ms) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t; }}' | grep "/"` ]]; then # Changed but not updated|Changes not staged for commit
+    elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^ M (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then # Changed but not updated|Changes not staged for commit
         color=${fg_bold[red]}
-    elif [[ -n `echo "$st" | grep "Your branch is ahead of"` ]]; then
+    elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^M  (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
         color=${fg[cyan]}
     elif [[ -n `echo "$st" | grep "Changes to be committed"` ]]; then
         color=${fg[blue]}
-    elif [[ -n `echo "$st" | perl -ne '@a; while($i=<STDIN>) {push @a, $i;}; $t = join "", @a; if ($t =~ m|^# Untracked files.+?to include in what will be committed.+?\n#(.+)#|ms) { $t = $1; @ua = split /\n/, $t; foreach my $u (@ua) { unless ($u =~ m|[.]{1,}/{1}|) { print $u; }}}' | grep "/"` ]]; then
+    elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^\?\?  (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
         color=${fg[yellow]}
     else
-        color=${fg[green]}
+        color=${fg[white]}
     fi
     # %{...%} は囲まれた文字列がエスケープシーケンスであることを明示する
     # これをしないと右プロンプトの位置がずれる

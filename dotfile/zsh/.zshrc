@@ -104,13 +104,13 @@ function rprompt-git-current-branch-status {
         elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^[ M]{1}M (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
             color=${fg_bold[red]}
         elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^M  (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
-            color=${fg[cyan]}
+            color=${fg[yellow]}
         elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^[ ADRC]{2} (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
-            color=${fg[cyan]}
+            color=${fg[yellow]}
         elif [[ `is_pushed` = "1" ]]; then
             color=${fg[blue]}
         elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^[ \?]{2} (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
-            color=${fg[yellow]}
+            color=${fg[cyan]}
         else
             color=${fg[green]}
         fi

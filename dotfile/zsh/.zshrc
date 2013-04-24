@@ -60,6 +60,28 @@ setopt prompt_subst  # ESCエスケープを有効にする
 # http://d.hatena.ne.jp/uasi/20091017/1255712789
 PROMPT='[%n@]%(!.#.$)'
 #RPROMPT='[%(5~,%-2~/.../%2~,%~)%#]'
+
+function is_pushed {
+    not_pushed="1"
+    head=$(git rev-parse --verify -q HEAD 2> /dev/null)
+    if [ $? -eq 0 ]; then # HEADのハッシュ値取得に成功 # リモートのハッシュ値を配列で取得
+        remotes=($(git rev-parse --remotes 2> /dev/null))
+        if [ "$remotes[*]" ]; then # リモートのハッシュ値取得に成功(リモートが存在する)
+            for x in ${remotes[@]}; do # リモートとHEADのハッシュ値が一致するか判定
+                if [ "$head" = "$x" ]; then # 一致した場合はPUSH済み
+                    not_pushed=""
+                    break
+                fi
+            done
+        else # リモートが存在しない場合
+            not_pushed=""
+        fi
+    else # HEADが存在しない場合(init直後など)
+        not_pushed=""
+    fi
+    echo "$not_pushed"
+}
+
 function rprompt-git-current-branch-status {
     local name st color
     if [[ "$PWD" =~ '/\.git(/.*)?$' ]]; then
@@ -70,21 +92,23 @@ function rprompt-git-current-branch-status {
         return
     fi
 
-    st=`perl -e 'eval { local $SIG{ALRM} = sub {die}; alarm(1); system("git status -s"); }; if ($@) { print "timeout\n"; }'`
-    if [[ -n `echo "$st" | grep "timeout" `  ]]; then
-        color=${fg[magenta]}
-    elif [[ $st = '' ]]; then
-        color=${fg[green]}
-    elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^ M (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then # Changed but not updated|Changes not staged for commit
-        color=${fg_bold[red]}
-    elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^M  (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
-        color=${fg[cyan]}
-    elif [[ -n `echo "$st" | grep "Changes to be committed"` ]]; then
-        color=${fg[blue]}
-    elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^\?\?  (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
-        color=${fg[yellow]}
-    else
-        color=${fg[white]}
+    st=$(perl -e 'eval { local $SIG{ALRM} = sub {die}; alarm(1); system("git status -s"); }; if ($@) { print "timeout\n"; }')
+    if [ $? -eq 0 ]; then
+        if [[ -n `echo "$st" | grep "timeout" `  ]]; then
+            color=${fg[magenta]}
+        elif [[ $st = '' ]]; then
+            color=${fg[green]}
+        elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^ M (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then # Changed but not updated|Changes not staged for commit
+            color=${fg_bold[red]}
+        elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^M  (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
+            color=${fg[cyan]}
+        elif [[ `is_pushed` = "1" ]]; then
+            color=${fg[blue]}
+        elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^\?\?  (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
+            color=${fg[yellow]}
+        else
+            color=${fg[white]}
+        fi
     fi
     # %{...%} は囲まれた文字列がエスケープシーケンスであることを明示する
     # これをしないと右プロンプトの位置がずれる

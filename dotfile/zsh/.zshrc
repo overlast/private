@@ -64,19 +64,20 @@ PROMPT='[%n@]%(!.#.$)'
 function is_pushed {
     not_pushed="1"
     head=$(git rev-parse --verify -q HEAD 2> /dev/null)
-    if [ $? -eq 0 ]; then # HEADのハッシュ値取得に成功 # リモートのハッシュ値を配列で取得
+    if [ $? -eq 0 ]; then # success to get hash value of HEAD ?
+        # let's get array of remote hash values
         remotes=($(git rev-parse --remotes 2> /dev/null))
-        if [ "$remotes[*]" ]; then # リモートのハッシュ値取得に成功(リモートが存在する)
-            for x in ${remotes[@]}; do # リモートとHEADのハッシュ値が一致するか判定
-                if [ "$head" = "$x" ]; then # 一致した場合はPUSH済み
+        if [ "$remotes[*]" ]; then # success to get hash value of remote ?
+            for x in ${remotes[@]}; do # let's compare head hash value and remote hash value
+                if [ "$head" = "$x" ]; then # already pushed ?
                     not_pushed=""
                     break
                 fi
             done
-        else # リモートが存在しない場合
+        else # remote is not there
             not_pushed=""
         fi
-    else # HEADが存在しない場合(init直後など)
+    else # HEAD is not there (maybe init)
         not_pushed=""
     fi
     echo "$not_pushed"
@@ -98,7 +99,7 @@ function rprompt-git-current-branch-status {
             color=${fg[magenta]}
         elif [[ $st = '' ]]; then
             color=${fg[green]}
-        elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^ M (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then # Changed but not updated|Changes not staged for commit
+        elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^ M (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
             color=${fg_bold[red]}
         elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^M  (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
             color=${fg[cyan]}

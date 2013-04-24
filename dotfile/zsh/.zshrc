@@ -96,16 +96,20 @@ function rprompt-git-current-branch-status {
     st=$(perl -e 'eval { local $SIG{ALRM} = sub {die}; alarm(1); system("git status -s"); }; if ($@) { print "timeout\n"; }')
     if [ $? -eq 0 ]; then
         if [[ -n `echo "$st" | grep "timeout" `  ]]; then
-            color=${fg[magenta]}
+            color=${fg[white]}
         elif [[ $st = '' ]]; then
             color=${fg[green]}
-        elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^ M (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
+        elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^[ U]{2} (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
+            color=${fg_bold[magenda]}
+        elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^[ M]{1}M (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
             color=${fg_bold[red]}
         elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^M  (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
             color=${fg[cyan]}
+        elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^[ ADRC]{2} (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
+            color=${fg[cyan]}
         elif [[ `is_pushed` = "1" ]]; then
             color=${fg[blue]}
-        elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^\?\? (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
+        elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^[ \?]{2} (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
             color=${fg[yellow]}
         else
             color=${fg[green]}

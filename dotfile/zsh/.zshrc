@@ -104,7 +104,7 @@ function rprompt-git-current-branch-status {
             color=${fg[cyan]}
         elif [[ `is_pushed` = "1" ]]; then
             color=${fg[blue]}
-        elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^\?\?  (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
+        elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^\?\? (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
             color=${fg[yellow]}
         else
             color=${fg[green]}

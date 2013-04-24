@@ -107,7 +107,7 @@ function rprompt-git-current-branch-status {
         elif [[ -n `echo "$st" | perl -e '@a; while($i=<STDIN>) { if ($i =~ m|^\?\?  (.+)|) { $t = $1; unless ($t =~ m|[.]{1,}/{1}|) { print $t."\n"; }}}' ` ]]; then
             color=${fg[yellow]}
         else
-            color=${fg[white]}
+            color=${fg[green]}
         fi
     fi
     # %{...%} は囲まれた文字列がエスケープシーケンスであることを明示する

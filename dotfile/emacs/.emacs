@@ -117,6 +117,12 @@
           :url "git://github.com/karupanerura/plenv.el.git"
           :load-path (".")
           )
+   (:name ac-python
+          :description "ac-python"
+          :type http
+          :url "http://chrispoole.com/downloads/ac-python.el"
+          :load-path (".")
+          )
    (:name direx
           :description "direx"
           :type git
@@ -653,10 +659,10 @@
    (setq-default tab-width 2 indent-tabs-mode nil) ; Set tab width and replace indent tabs to spaces
    ))
 
-
-(autoload 'python "python" nil t)
+(autoload 'python-mode "python" nil t)
 (eval-after-load "python"
   '(progn
+     ; https://github.com/purcell/flymake-python-pyflakes
      (require 'flymake-python-pyflakes)
      (defun flymake-python-load ()
        (interactive)
@@ -671,9 +677,14 @@
                                    (setq flymake-python-pyflakes-executable "flake8")
                                    ;; ignore the character counting process for a comment line
                                    (setq flymake-python-pyflakes-extra-arguments '("--ignore=E501"))
+                                   (interactive)
+                                   (el-get 'sync '(ac-python))
+                                   (require 'ac-python)
+                                   (add-to-list 'ac-modes 'python-2-mode)
                                 ))
 
   ))
+
 ;======================================================================
 ; Flyspell
 ;======================================================================
@@ -691,3 +702,4 @@
 (add-hook 'c-mode-common-hook 'flyspell-prog-mode-hooks)
 (add-hook 'cperl-mode-hook 'flyspell-prog-mode-hooks)
 (add-hook 'emacs-lisp-common-hook 'flyspell-prog-mode-hooks)
+(add-hook 'python-mode-hook 'flyspell-prog-mode-hooks)

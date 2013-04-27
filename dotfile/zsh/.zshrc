@@ -294,3 +294,10 @@ if [ -d ${HOME}/.pyenv  ] ; then
   export PATH="${HOME}/.pyenv/bin:${PATH}"
   eval "$(pyenv init -)" # == 'export PATH="${HOME}/.pyenv/shims:${PATH}"'
 fi
+
+# rbenv
+# how to install : cd; git clone git://github.com/sstephenson/rbenv.git ~/.rbenv
+if [ -d ${HOME}/.rbenv  ] ; then
+  export PATH="${HOME}/.rbenv/bin:${PATH}"
+  eval "$(rbenv init -)" # == 'export PATH="${HOME}/.rbenv/shims:${PATH}"'
+fi

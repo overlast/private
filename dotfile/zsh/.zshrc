@@ -276,7 +276,13 @@ zstyle ':completion:*' ignore-parents parent pwd ..
 # able to use C-s and C-q
 stty -ixon
 
-#perlbrew
-if [ -f ${HOME}/perl5/perlbrew/etc/bashrc ] ; then
-    source ${HOME}/perl5/perlbrew/etc/bashrc
+# plenv
+if [ -d ${HOME}/.plenv  ] ; then
+  export PATH="${HOME}/.plenv/bin:${PATH}"
+  eval "$(plenv init -)" # == 'export PATH="${HOME}/.plenv/shims:${PATH}"'
 fi
+
+##perlbrew
+#if [ -f ${HOME}/perl5/perlbrew/etc/bashrc ] ; then
+#    source ${HOME}/perl5/perlbrew/etc/bashrc
+#fi

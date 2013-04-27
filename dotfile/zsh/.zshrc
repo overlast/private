@@ -277,6 +277,7 @@ zstyle ':completion:*' ignore-parents parent pwd ..
 stty -ixon
 
 # plenv
+# how to install : git clone git://github.com/tokuhirom/plenv.git ~/.plenv
 if [ -d ${HOME}/.plenv  ] ; then
   export PATH="${HOME}/.plenv/bin:${PATH}"
   eval "$(plenv init -)" # == 'export PATH="${HOME}/.plenv/shims:${PATH}"'

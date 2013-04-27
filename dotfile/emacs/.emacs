@@ -108,6 +108,12 @@
           :url "git://github.com/dams/perlbrew-mini.el.git"
           :load-path (".")
           )
+   (:name plenv
+          :description "plenv"
+          :type git
+          :url "git://github.com/karupanerura/plenv.el.git"
+          :load-path (".")
+          )
    (:name direx
           :description "direx"
           :type git
@@ -566,10 +572,15 @@
   '(progn
      ; https://github.com/kentaro/perlbrew.el/blob/master/perlbrew.el
      ; https://github.com/dams/perlbrew-mini.el
-     (el-get 'sync '(perlbrew-mini))
-     (require 'perlbrew-mini)
+;     (el-get 'sync '(perlbrew-mini))
+;     (require 'perlbrew-mini)
+
+     ; https://github.com/karupanerura/plenv.el
+     (el-get 'sync '(plenv))
+     (require 'plenv)
+
      ;(perlbrew-mini-use-latest)
-     (perlbrew-mini-use "perl-5.16.2")
+     ;(perlbrew-mini-use "perl-5.16.2")
 
      ; http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el
      (el-get 'sync '(set-perl5lib))
@@ -585,8 +596,9 @@
               (local-file (file-relative-name
                            temp-file
                            (file-name-directory buffer-file-name))))
-         (list (perlbrew-mini-get-current-perl-path)
-               (list "-MProject::Libs" "-wc" local-file))))
+         ;(list (perlbrew-mini-get-current-perl-path) (list "-MProject::Libs" "-wc" local-file))
+         (list (guess-plenv-perl-path) (list "-wc" local-file))
+         ))
 
      (defun flymake-perl-load ()
        (interactive)

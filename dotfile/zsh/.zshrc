@@ -277,7 +277,7 @@ zstyle ':completion:*' ignore-parents parent pwd ..
 stty -ixon
 
 # plenv
-# how to install : git clone git://github.com/tokuhirom/plenv.git ~/.plenv
+# how to install : cd; git clone git://github.com/tokuhirom/plenv.git ~/.plenv
 if [ -d ${HOME}/.plenv  ] ; then
   export PATH="${HOME}/.plenv/bin:${PATH}"
   eval "$(plenv init -)" # == 'export PATH="${HOME}/.plenv/shims:${PATH}"'
@@ -287,3 +287,10 @@ fi
 #if [ -f ${HOME}/perl5/perlbrew/etc/bashrc ] ; then
 #    source ${HOME}/perl5/perlbrew/etc/bashrc
 #fi
+
+# pyenv
+# how to install : cd; git clone git://github.com/yyuu/pyenv.git .pyenv
+if [ -d ${HOME}/.pyenv  ] ; then
+  export PATH="${HOME}/.pyenv/bin:${PATH}"
+  eval "$(pyenv init -)" # == 'export PATH="${HOME}/.pyenv/shims:${PATH}"'
+fi

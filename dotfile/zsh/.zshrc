@@ -273,7 +273,9 @@ zstyle ':completion:*' ignore-parents parent pwd ..
 #cd -1とかできる
 #setopt autopushd
 
+# able to use C-s and C-q
 stty -ixon
+
 export PERLBREW_BASHRC_VERSION=0.46
 
 [[ -z "$PERLBREW_ROOT" ]] && export PERLBREW_ROOT="$HOME/perl5/perlbrew"

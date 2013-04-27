@@ -39,6 +39,7 @@
     ;pushy
     ;dmacro
     ;moccur-edit
+    flymake-easy
     recentf-ext
     anything
     helm
@@ -52,9 +53,11 @@
 ;    zlc
     recentf
     flyspell
+    flymake-cursor
     git-gutter
     git-gutter-fringe
     color-theme-solarized
+    flymake-python-pyflakes
     ;direx
     ))
 (let ((not-installed (loop for x in installing-package-list
@@ -464,6 +467,7 @@
 ;======================================================================
 
 (require 'flymake)
+(require 'flymake-cursor)
 
 (set-face-background 'flymake-errline "red4")
 (set-face-foreground 'flymake-errline "black")
@@ -589,7 +593,7 @@
      (defvar flymake-perl-err-line-patterns
        '(("\\(.*\\) at \\([^ \n]+\\) line \\([0-9]+\\)[,.\n]" 2 3 nil 1)))
      (defconst flymake-allowed-perl-file-name-masks
-       '("\\([Pp][Llm]\\|cgi\\|t\\|psgi\\)$" flymake-perl-init))
+       '("\\.\\([Pp][Llm]\\|cgi\\|t\\|psgi\\)$" flymake-perl-init))
      (defun flymake-perl-init ()
        (let* ((temp-file (flymake-init-create-temp-buffer-copy
                           'flymake-create-temp-inplace))
@@ -649,6 +653,27 @@
    (setq-default tab-width 2 indent-tabs-mode nil) ; Set tab width and replace indent tabs to spaces
    ))
 
+
+(autoload 'python "python" nil t)
+(eval-after-load "python"
+  '(progn
+     (require 'flymake-python-pyflakes)
+     (defun flymake-python-load ()
+       (interactive)
+       (defadvice flymake-post-syntax-check (before flymake-force-check-was-interrupted)
+         (setq flymake-check-was-interrupted t))
+       (ad-activate 'flymake-post-syntax-check)
+       (flymake-mode t)
+       )
+     (add-hook 'python-mode-hook (lambda ()
+                                   (flymake-python-load)
+                                   (flymake-python-pyflakes-load)
+                                   (setq flymake-python-pyflakes-executable "flake8")
+                                   ;; ignore the character counting process for a comment line
+                                   (setq flymake-python-pyflakes-extra-arguments '("--ignore=E501"))
+                                ))
+
+  ))
 ;======================================================================
 ; Flyspell
 ;======================================================================

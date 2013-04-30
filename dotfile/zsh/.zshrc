@@ -152,7 +152,7 @@ function get_llenv_versions {
         echo -n `rbenv_ruby_version`
     fi
     if [ $IS_ECHO -eq 1 ] ; then
-        echo -n ")"
+        echo -n ") "
     fi
 }
 
@@ -214,7 +214,7 @@ function rprompt-git-current-branch-status {
     # これをしないと右プロンプトの位置がずれる
     echo "%{$color%}$name%{$reset_color%} "
 }
-RPROMPT='[`get_llenv_versions` `rprompt-git-current-branch-status`%(5~,%-2~/.../%2~,%~)%#]'
+RPROMPT='[`get_llenv_versions``rprompt-git-current-branch-status`%(5~,%-2~/.../%2~,%~)%#]'
 
 #コマンドが上手く表示されないときは
 #Emacsの場合はctrl+qしてescを押すと「」と出るので

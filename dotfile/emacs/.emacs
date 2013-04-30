@@ -58,6 +58,7 @@
     git-gutter-fringe
     color-theme-solarized
     flymake-python-pyflakes
+    ruby-mode
     ;direx
     ))
 (let ((not-installed (loop for x in installing-package-list
@@ -511,7 +512,7 @@
                 ("Makefile_.*$" . makefile-gmake-mode)
                 ) auto-mode-alist))
 (autoload 'c++-mode "makefile-gmake-mode" nil t)
-; remove hook to save \t character
+;; remove hook to save \t character
 (eval-after-load "makefile-gmake-mode"
   '(progn (
            (remove-hook 'before-save-hook 'delete-trailing-whitespace)
@@ -567,32 +568,32 @@
                   ))
      ))
 
-; Perl mode
-; http://ash.roova.jp/perl-to-the-people/emacs-cperl-mode.html
-; http://d.hatena.ne.jp/antipop/20110413/1302671667
-; http://search.cpan.org/dist/Project-Libs/lib/Project/Libs.pm
-; http://d.hatena.ne.jp/sugyan/20120227/1330343152
+;; Perl mode
+;; http://ash.roova.jp/perl-to-the-people/emacs-cperl-mode.html
+;; http://d.hatena.ne.jp/antipop/20110413/1302671667
+;; http://search.cpan.org/dist/Project-Libs/lib/Project/Libs.pm
+;; http://d.hatena.ne.jp/sugyan/20120227/1330343152
 
 (autoload 'cperl-mode "cperl-mode" nil t)
-(defalias 'perl-mode 'cperl-mode) ; show preference for cperl-mode
+(defalias 'perl-mode 'cperl-mode) ;; show preference for cperl-mode
 (setq auto-mode-alist
       (append '(("\\.\\(cgi\\|t\\|psgi\\)$" . cperl-mode))
               auto-mode-alist))
 (eval-after-load "cperl-mode"
   '(progn
-     ; https://github.com/kentaro/perlbrew.el/blob/master/perlbrew.el
-     ; https://github.com/dams/perlbrew-mini.el
-;     (el-get 'sync '(perlbrew-mini))
-;     (require 'perlbrew-mini)
+     ;; https://github.com/kentaro/perlbrew.el/blob/master/perlbrew.el
+     ;; https://github.com/dams/perlbrew-mini.el
+     ;;     (el-get 'sync '(perlbrew-mini))
+     ;;     (require 'perlbrew-mini)
 
-     ; https://github.com/karupanerura/plenv.el
+     ;; https://github.com/karupanerura/plenv.el
      (el-get 'sync '(plenv))
      (require 'plenv)
 
-     ;(perlbrew-mini-use-latest)
-     ;(perlbrew-mini-use "perl-5.16.2")
+     ;; (perlbrew-mini-use-latest)
+     ;; (perlbrew-mini-use "perl-5.16.2")
 
-     ; http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el
+     ;; http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el
      (el-get 'sync '(set-perl5lib))
      (require 'set-perl5lib)
 
@@ -600,19 +601,20 @@
        '(("\\(.*\\) at \\([^ \n]+\\) line \\([0-9]+\\)[,.\n]" 2 3 nil 1)))
      (defconst flymake-allowed-perl-file-name-masks
        '("\\.\\([Pp][Llm]\\|cgi\\|t\\|psgi\\)$" flymake-perl-init))
+
      (defun flymake-perl-init ()
        (let* ((temp-file (flymake-init-create-temp-buffer-copy
                           'flymake-create-temp-inplace))
               (local-file (file-relative-name
                            temp-file
                            (file-name-directory buffer-file-name))))
-         ;(list (perlbrew-mini-get-current-perl-path) (list "-MProject::Libs" "-wc" local-file))
+         ;;(list (perlbrew-mini-get-current-perl-path) (list "-MProject::Libs" "-wc" local-file))
          (list (guess-plenv-perl-path) (list "-wc" local-file))
          ))
 
      (defun flymake-perl-load ()
        (interactive)
-       ; http://d.hatena.ne.jp/sugyan/20100705/1278306885
+       ;; http://d.hatena.ne.jp/sugyan/20100705/1278306885
        (defadvice flymake-post-syntax-check (before flymake-force-check-was-interrupted)
          (setq flymake-check-was-interrupted t))
        (ad-activate 'flymake-post-syntax-check)
@@ -623,7 +625,7 @@
        )
 
      (add-hook 'cperl-mode-hook (lambda ()
-                                  ; Set tab width and replace indent tabs to spaces
+                                  ;; Set tab width and replace indent tabs to spaces
                                   (setq indent-tabs-mode nil)
                                   (setq cperl-font-lock t)
                                   (cperl-set-style "PerlStyle")
@@ -636,11 +638,11 @@
                                   (setq cperl-label-offset -4)
                                   (setq cperl-highlight-variables-indiscriminately t)
 
-                                  ; http://d.hatena.ne.jp/IMAKADO/20081129/1227893458
+                                  ;; http://d.hatena.ne.jp/IMAKADO/20081129/1227893458
                                   (el-get 'sync '(perl-completion))
                                   (require 'perl-completion)
 
-                                  ; http://d.hatena.ne.jp/sugyan/20120103/1325523629
+                                  ;; http://d.hatena.ne.jp/sugyan/20120103/1325523629
                                   (interactive)
 
                                   (defvar ac-source-my-perl-completion
@@ -659,11 +661,11 @@
    (setq-default tab-width 2 indent-tabs-mode nil) ; Set tab width and replace indent tabs to spaces
    ))
 
-(autoload 'python-mode "python" nil t)
+(autoload 'python "python" nil t)
+(defalias 'python-mode 'python)
 (eval-after-load "python"
   '(progn
-     ; https://github.com/purcell/flymake-python-pyflakes
-     (require 'flymake-python-pyflakes)
+     ;; https://github.com/purcell/flymake-python-pyflakes
      (defun flymake-python-load ()
        (interactive)
        (defadvice flymake-post-syntax-check (before flymake-force-check-was-interrupted)
@@ -672,18 +674,62 @@
        (flymake-mode t)
        )
      (add-hook 'python-mode-hook (lambda ()
-                                   (flymake-python-load)
+                                   (require 'flymake-python-pyflakes)
                                    (flymake-python-pyflakes-load)
+
                                    (setq flymake-python-pyflakes-executable "flake8")
                                    ;; ignore the character counting process for a comment line
                                    (setq flymake-python-pyflakes-extra-arguments '("--ignore=E501"))
                                    (interactive)
+
                                    (el-get 'sync '(ac-python))
                                    (require 'ac-python)
                                    (add-to-list 'ac-modes 'python-2-mode)
-                                ))
+
+                                   (flymake-python-load)
+                                   ))
 
   ))
+
+(autoload 'ruby-mode "ruby-mode" nil t)
+(eval-after-load "ruby-mode"
+  '(progn
+
+     (setq exec-path (cons (expand-file-name "~/.rbenv/shims") exec-path))
+     (setenv "PATH" (concat (expand-file-name "~/.rbenv/shims:") (getenv "PATH")))
+
+     (defun flymake-ruby-init ()
+       (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                          'flymake-create-temp-inplace))
+              (local-file (file-relative-name
+                           temp-file
+                           (file-name-directory buffer-file-name))))
+         (list "ruby-lint" (list "-h" local-file))))
+
+     (defconst flymake-allowed-ruby-file-name-masks
+       '(("\\(\\.rb\\|Rakefile\\)$" flymake-ruby-init)))
+
+  ;;   (defvar flymake-ruby-err-line-patterns
+    ;;   '(("^\\(.*\\): .+: line \\([0-9]+\\), column \\([0-9]+\\): \\(.*\\)" 2 4 3 1)))
+
+     (defun flymake-ruby-load ()
+       (interactive)
+       ;; http://d.hatena.ne.jp/sugyan/20100705/1278306885
+       (defadvice flymake-post-syntax-check (before flymake-force-check-was-interrupted)
+         (setq flymake-check-was-interrupted t))
+       (ad-activate 'flymake-post-syntax-check)
+       (setq flymake-allowed-file-name-masks
+             (append flymake-allowed-file-name-masks flymake-allowed-ruby-file-name-masks))
+;;       (setq flymake-err-line-patterns flymake-ruby-err-line-patterns)
+       (flymake-mode t))
+
+     (add-hook 'ruby-mode-hook (lambda ()
+                                 ;; Set tab width and replace indent tabs to spaces
+                                 (interactive)
+                                 (flymake-ruby-load)
+                                 ))
+
+))
 
 ;======================================================================
 ; Flyspell
@@ -703,3 +749,4 @@
 (add-hook 'cperl-mode-hook 'flyspell-prog-mode-hooks)
 (add-hook 'emacs-lisp-common-hook 'flyspell-prog-mode-hooks)
 (add-hook 'python-mode-hook 'flyspell-prog-mode-hooks)
+(add-hook 'ruby-mode-hook 'flyspell-prog-mode-hooks)

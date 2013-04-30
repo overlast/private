@@ -25,6 +25,7 @@
 (require 'package)
 
 ; Add package-archives
+(add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
 (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
 
@@ -35,10 +36,7 @@
 (defvar installing-package-list
   '(
     ;; ここに使っているパッケージを書く。
-    ;auto-save-buffers
-    ;pushy
-    ;dmacro
-    ;moccur-edit
+    color-moccur
     flymake-easy
     recentf-ext
     anything
@@ -59,7 +57,6 @@
     color-theme-solarized
     flymake-python-pyflakes
     ruby-mode
-    ;direx
     ))
 (let ((not-installed (loop for x in installing-package-list
                             when (not (package-installed-p x))
@@ -122,6 +119,12 @@
           :description "ac-python"
           :type http
           :url "http://chrispoole.com/downloads/ac-python.el"
+          :load-path (".")
+          )
+   (:name moccur-edit
+          :description "moccur-edit"
+          :type http
+          :url "http://www.bookshelf.jp/elc/moccur-edit.el"
           :load-path (".")
           )
    (:name direx
@@ -191,7 +194,6 @@
 ;; http://www.bookshelf.jp/soft/meadow_50.html#SEC746
 ;======================================================================
 
-(el-get 'sync '(color-moccur))
 (require 'color-moccur)
 ;; http://d.hatena.ne.jp/higepon/20060222/1140579843
 (setq color-occur-kill-occur-buffer t)
@@ -442,20 +444,20 @@
 ; Pushy
 ;======================================================================
 
-(el-get 'sync '(pushy))
-(require 'pushy)
-(setq pushy-keys
-      (list (cons (kbd "C-<return>") 'pushy-insert-item)    ; 候補を入力
-            ;; (cons (kbd "<ESC>") 'pushy-cleanup)  ; 通常の補完ができなくなるのでいらん
-            (cons (kbd "C-<up>") 'pushy-previous-line)
-            (cons (kbd "C-<down>") 'pushy-next-line)
-            (cons (kbd "C-<prior>") 'pushy-previous-page)
-            (cons (kbd "C-<next>") 'pushy-next-page)))
-(setq pushy-enable-globally nil)
-(put 'eval-expression 'pushy-completion 'enabled)
-(put 'shell-command 'pushy-completion 'enabled)
-(put 'shell-command-on-region 'pushy-completion 'enabled)
-(pushy-mode 1)
+;(el-get 'sync '(pushy))
+;(require 'pushy)
+;(setq pushy-keys
+;      (list (cons (kbd "C-<return>") 'pushy-insert-item)    ; 候補を入力
+;            ;; (cons (kbd "<ESC>") 'pushy-cleanup)  ; 通常の補完ができなくなるのでいらん
+;            (cons (kbd "C-<up>") 'pushy-previous-line)
+;            (cons (kbd "C-<down>") 'pushy-next-line)
+;            (cons (kbd "C-<prior>") 'pushy-previous-page)
+;            (cons (kbd "C-<next>") 'pushy-next-page)))
+;(setq pushy-enable-globally nil)
+;(put 'eval-expression 'pushy-completion 'enabled)
+;(put 'shell-command 'pushy-completion 'enabled)
+;(put 'shell-command-on-region 'pushy-completion 'enabled)
+;(pushy-mode 1)
 
 ;======================================================================
 ; Auto Complete Mode
@@ -655,11 +657,10 @@
      ))
 
 ;; emacs-lisp-mode
-(add-hook
- 'emacs-lisp-mode-hook
- (lambda ()
-   (setq-default tab-width 2 indent-tabs-mode nil) ; Set tab width and replace indent tabs to spaces
-   ))
+(add-hook 'emacs-lisp-mode-hook
+          (lambda ()
+            ;; Set tab width and replace indent tabs to spaces
+            (setq-default tab-width 2 indent-tabs-mode nil)))
 
 (autoload 'python "python" nil t)
 (defalias 'python-mode 'python)
@@ -670,9 +671,8 @@
        (interactive)
        (defadvice flymake-post-syntax-check (before flymake-force-check-was-interrupted)
          (setq flymake-check-was-interrupted t))
-       (ad-activate 'flymake-post-syntax-check)
-       (flymake-mode t)
-       )
+          (ad-activate 'flymake-post-syntax-check)
+          (flymake-mode t))
      (add-hook 'python-mode-hook (lambda ()
                                    (require 'flymake-python-pyflakes)
                                    (flymake-python-pyflakes-load)
@@ -685,51 +685,35 @@
                                    (el-get 'sync '(ac-python))
                                    (require 'ac-python)
                                    (add-to-list 'ac-modes 'python-2-mode)
+                                   (flymake-python-load)))))
 
-                                   (flymake-python-load)
-                                   ))
-
-  ))
-
+;; flymake-ruby
 (autoload 'ruby-mode "ruby-mode" nil t)
 (eval-after-load "ruby-mode"
   '(progn
-
-     (setq exec-path (cons (expand-file-name "~/.rbenv/shims") exec-path))
-     (setenv "PATH" (concat (expand-file-name "~/.rbenv/shims:") (getenv "PATH")))
-
      (defun flymake-ruby-init ()
-       (let* ((temp-file (flymake-init-create-temp-buffer-copy
-                          'flymake-create-temp-inplace))
-              (local-file (file-relative-name
-                           temp-file
-                           (file-name-directory buffer-file-name))))
-         (list "ruby-lint" (list "-h" local-file))))
-
-     (defconst flymake-allowed-ruby-file-name-masks
-       '(("\\(\\.rb\\|Rakefile\\)$" flymake-ruby-init)))
-
-  ;;   (defvar flymake-ruby-err-line-patterns
-    ;;   '(("^\\(.*\\): .+: line \\([0-9]+\\), column \\([0-9]+\\): \\(.*\\)" 2 4 3 1)))
-
+       (let* ((temp-file   (flymake-init-create-temp-buffer-copy
+                            'flymake-create-temp-inplace))
+              (local-file  (file-relative-name
+                            temp-file
+                            (file-name-directory buffer-file-name))))
+         (list "ruby" (list "-w" local-file))))
+     (push '(".+\\.\\(rb\\|rake\\)$" flymake-ruby-init) flymake-allowed-file-name-masks)
+     (push '("Rakefile$" flymake-ruby-init) flymake-allowed-file-name-masks)
+     (push '("^\\(.*\\):\\([0-9]+\\): \\(.*\\)$" 1 2 nil 3) flymake-err-line-patterns)
      (defun flymake-ruby-load ()
        (interactive)
        ;; http://d.hatena.ne.jp/sugyan/20100705/1278306885
        (defadvice flymake-post-syntax-check (before flymake-force-check-was-interrupted)
          (setq flymake-check-was-interrupted t))
        (ad-activate 'flymake-post-syntax-check)
-       (setq flymake-allowed-file-name-masks
-             (append flymake-allowed-file-name-masks flymake-allowed-ruby-file-name-masks))
-;;       (setq flymake-err-line-patterns flymake-ruby-err-line-patterns)
        (flymake-mode t))
-
      (add-hook 'ruby-mode-hook (lambda ()
-                                 ;; Set tab width and replace indent tabs to spaces
                                  (interactive)
-                                 (flymake-ruby-load)
-                                 ))
-
-))
+                                 ;; Don't want flymake mode for ruby regions in rhtml files and also on read
+                                 (if (and (not (null buffer-file-name)) (file-writable-p buffer-file-name))
+                                     (flymake-ruby-load))
+                                 ))))
 
 ;======================================================================
 ; Flyspell

@@ -61,6 +61,93 @@ setopt prompt_subst  # ESCエスケープを有効にする
 PROMPT='[%n@]%(!.#.$)'
 #RPROMPT='[%(5~,%-2~/.../%2~,%~)%#]'
 
+plenv_perl_version() {
+    local dir=$PWD
+
+    [[ -n $PLENV_VERSION ]] && { echo $PLENV_VERSION; return }
+
+    while [[ -n $dir && $dir != "/" && $dir != "." ]]; do
+        if [[ -f "$dir/.perl-version" ]]; then
+            head -n 1 "$dir/.perl-version"
+            return
+        fi
+        dir=$dir:h
+    done
+
+    local plenv_home=$PLENV_HOME
+    [[ -z $PLENV_HOME && -n $HOME ]] && plenv_home="$HOME/.plenv"
+
+    if [[ -f "$plenv_home/version" ]]; then
+        head -n 1 "$plenv_home/version"
+    fi
+}
+
+pyenv_python_version() {
+    local dir=$PWD
+
+    [[ -n $PYENV_VERSION ]] && { echo $PYENV_VERSION; return }
+
+    while [[ -n $dir && $dir != "/" && $dir != "." ]]; do
+        if [[ -f "$dir/.python-version" ]]; then
+            head -n 1 "$dir/.python-version"
+            return
+        fi
+        dir=$dir:h
+    done
+
+    local pyenv_home=$PYENV_HOME
+    [[ -z $PYENV_HOME && -n $HOME ]] && pyenv_home="$HOME/.pyenv"
+
+    if [[ -f "$pyenv_home/version" ]]; then
+        head -n 1 "$pyenv_home/version"
+    fi
+}
+
+rbenv_ruby_version() {
+    local dir=$PWD
+
+    [[ -n $RBENV_VERSION ]] && { echo $RBENV_VERSION; return }
+
+    while [[ -n $dir && $dir != "/" && $dir != "." ]]; do
+        if [[ -f "$dir/.ruby-version" ]]; then
+            head -n 1 "$dir/.ruby-version"
+            return
+        fi
+        dir=$dir:h
+    done
+
+    local rbenv_home=$RBENV_HOME
+    [[ -z $RBENV_HOME && -n $HOME ]] && rbenv_home="$HOME/.rbenv"
+
+    if [[ -f "$rbenv_home/version" ]]; then
+        head -n 1 "$rbenv_home/version"
+    fi
+}
+
+function get_llenv_versions {
+    IS_ECHO=0;
+    if [ -d ${HOME}/.plenv  ] ; then
+        echo -n `plenv_perl_version`
+        IS_ECHO=1
+    fi
+
+    if [ -d ${HOME}/.pyenv  ] ; then
+        if [ $IS_ECHO -eq 1 ] ; then
+            echo -n "/"
+        fi
+        IS_ECHO=1
+        echo -n `pyenv_python_version`
+    fi
+
+    if [ -d ${HOME}/.rbenv  ] ; then
+        if [ $IS_ECHO -eq 1 ] ; then
+            echo -n "/"
+        fi
+        IS_ECHO=1
+        echo -n `rbenv_ruby_version`
+    fi
+}
+
 function is_pushed {
     not_pushed="1"
     head=$(git rev-parse --verify -q HEAD 2> /dev/null)
@@ -119,7 +206,7 @@ function rprompt-git-current-branch-status {
     # これをしないと右プロンプトの位置がずれる
     echo "%{$color%}$name%{$reset_color%} "
 }
-RPROMPT='[`rprompt-git-current-branch-status`%(5~,%-2~/.../%2~,%~)%#]'
+RPROMPT='[(`get_llenv_versions`) `rprompt-git-current-branch-status`%(5~,%-2~/.../%2~,%~)%#]'
 
 #コマンドが上手く表示されないときは
 #Emacsの場合はctrl+qしてescを押すと「」と出るので

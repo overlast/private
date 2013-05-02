@@ -71,7 +71,7 @@ plenv_perl_version() {
             head -n 1 "$dir/.perl-version"
             return
         fi
-        dir=$dir:h
+        dir=$(dirname $dir)
     done
 
     local plenv_home=$PLENV_HOME
@@ -92,7 +92,7 @@ pyenv_python_version() {
             head -n 1 "$dir/.python-version"
             return
         fi
-        dir=$dir:h
+        dir=$(dirname $dir)
     done
 
     local pyenv_home=$PYENV_HOME
@@ -113,7 +113,7 @@ rbenv_ruby_version() {
             head -n 1 "$dir/.ruby-version"
             return
         fi
-        dir=$dir:h
+        dir=$(dirname $dir)
     done
 
     local rbenv_home=$RBENV_HOME

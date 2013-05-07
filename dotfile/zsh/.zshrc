@@ -30,6 +30,9 @@ setopt auto_pushd
 setopt list_packed
 setopt nolistbeep
 
+# コピペしやすいようにコマンド実行後は右プロンプトを消す。
+setopt transient_rprompt
+
 # カレントディレクトリに候補がない場合のみ cdpath 上のディレクトリを候補
 zstyle ':completion:*:cd:*' tag-order local-directories path-directories
 

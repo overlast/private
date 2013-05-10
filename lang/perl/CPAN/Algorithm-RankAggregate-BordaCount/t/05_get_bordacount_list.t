@@ -4,13 +4,13 @@ use Test::More tests => 9;
 use Algorithm::RankAggregate::BordaCount;
 
 my @case_00 = (1, 2, 3, 4, 5);
-my @ans_00 =  (5, 4, 3, 2, 1);
+my @ans_00 =  (4, 3, 2, 1, 0);
 
 my @case_01 = (5, 4, 2, 1, 3);
-my @ans_01 =  (1, 2, 4, 5, 3);
+my @ans_01 =  (0, 1, 3, 4, 2);
 
 my @case_02 = (5, 1, 4, 3, 2);
-my @ans_02 =   (1, 5, 2, 3, 4);
+my @ans_02 =   (0, 4, 1, 2, 3);
 
 my @case_03 = (5, 1, 4, 3, 2);
 my @ans_03_0 = (0, 0, 0, 0, 0);

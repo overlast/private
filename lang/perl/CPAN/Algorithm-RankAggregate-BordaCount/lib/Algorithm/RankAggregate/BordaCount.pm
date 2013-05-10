@@ -4,7 +4,7 @@ use warnings;
 our $VERSION = '0.01';
 
 sub get_ranked_list {
-    my ($this, $score_list, $top_k_num) = @_;
+    my ($this, $score_list) = @_;
     my @ranked_list = ();
     my %real_num_hash;
     my $i = 1;
@@ -24,23 +24,17 @@ sub get_ranked_list {
             $same_rank = 0;
             $current_num = $real_num_hash{$k};
         }
-        if ((defined $top_k_num) && ($j > $top_k_num)) {
-            $ranked_list[$k - 1] = -1;
-        }
-        else {
-            $ranked_list[$k - 1] = $j;
-        }
+        $ranked_list[$k - 1] = $j;
     }
     return \@ranked_list;
 }
 
 sub get_ranked_lists_list {
-    my ($this, $score_lists_list, $top_k_num) = @_;
+    my ($this, $score_lists_list) = @_;
     my @lists_list = ();
     my $i = 0;
     foreach my $score_list (@{$score_lists_list}) {
-        $top_k_num = ($#{$score_list} + 1) unless ($top_k_num);
-        my $ranked_list = $this->get_ranked_list($score_list, $top_k_num);
+        my $ranked_list = $this->get_ranked_list($score_list);
         push @lists_list, $ranked_list;
         $i++;
     }

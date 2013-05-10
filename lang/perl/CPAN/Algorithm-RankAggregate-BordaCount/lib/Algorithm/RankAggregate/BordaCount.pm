@@ -1,4 +1,5 @@
 package Algorithm::RankAggregate::BordaCount;
+
 use strict;
 use warnings;
 our $VERSION = '0.01';
@@ -62,7 +63,7 @@ sub validate_lists_list {
 sub get_bordacount_list {
     my ($this, $ranked_list, $top_k_num) = @_;
     my @bordacount_list;
-    $top_k_num = $#{$ranked_list} + 1 unless (defined $top_k_num);
+    $top_k_num = $#{$ranked_list} unless (defined $top_k_num);
     foreach my $rank_num (@{$ranked_list}) {
         my $score = 0;
         if (($rank_num > 0) && ($rank_num <= $top_k_num)) {
@@ -145,11 +146,21 @@ __END__
 
 =head1 NAME
 
-Algorithm::RankAggregate::BordaCount -
+Algorithm::RankAggregate::BordaCount - Pure Perl implementation of Borda count
 
 =head1 SYNOPSIS
 
   use Algorithm::RankAggregate::BordaCount;
+
+  my @case_00 = (
+      [-26.8,  -3.8, -11.2, -9.4, -2.7],
+      [-24.8,  18.2, -8.0,  -3.4, 18.0],
+      [-17.7,  13.0, -2.4,  -5.7, 12.9],
+  );
+
+  my $bc = Algorithm::RankAggregate::BordaCount->new();
+  my $result_00 = $bc->aggregate(\@case_00, 4);
+
 
 =head1 DESCRIPTION
 
@@ -157,9 +168,11 @@ Algorithm::RankAggregate::BordaCount is
 
 =head1 AUTHOR
 
-Toshinori Sato E<lt>overlasting {at} gmail.comE<gt>
+Toshinori Sato (@overlast) E<lt>overlasting {at} gmail.comE<gt>
 
 =head1 SEE ALSO
+
+https://github.com/overlast/private/tree/master/lang/perl/CPAN
 
 =head1 LICENSE
 

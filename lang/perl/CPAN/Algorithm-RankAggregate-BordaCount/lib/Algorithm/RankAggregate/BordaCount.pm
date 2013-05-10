@@ -3,85 +3,146 @@ use strict;
 use warnings;
 our $VERSION = '0.01';
 
-sub get_ranked_lists {
-    my ($this, $score_lists) = @_;
-    my @ranked_lists = ();
+sub get_ranked_list {
+    my ($this, $score_list, $top_k_num) = @_;
+    my @ranked_list = ();
     my %real_num_hash;
     my $i = 1;
-    foreach my $real_num (@{$score_lists}) {
-        $real_num_hash{$real_num} = $i;
+    foreach my $real_num (@{$score_list}) {
+        $real_num_hash{$i} = $real_num;
         $i++;
     }
-    foreach my $real_num (sort {$b <=> $a} keys %real_num_hash) {
-        push @ranked_lists, $real_num_hash{$real_num};
-    }
-    return \@ranked_lists;
-}
-
-sub get_weighted_score_lists {
-    my ($this, $score_lists, $row_num) = @_;
-    my @weighted_score_lists = ();
-    foreach my $real_num (@{$score_lists}) {
-        my $weighted_real_num = $real_num * $this->{weight}->[$row_num];
-        push @weighted_score_lists, $weighted_real_num;
-    }
-    return \@weighted_score_lists;
-}
-
-sub get_ranked_lists_lists {
-    my ($this, $score_lists_lists, $top_k_num) = @_;
-    my @lists_lists = ();
-    my $i = 0;
-    foreach my $score_lists (@{$score_lists_lists}) {
-        if ((exists $this->{weight}) && (exists $this->{weight}->[$i])) {
-            $score_lists = $this->get_weighted_score_lists($score_lists, $i);
+    my $current_num = 0;
+    my $same_rank = 0;
+    my $j = 0;
+    foreach my $k (sort {$real_num_hash{$b} <=> $real_num_hash{$a}} keys %real_num_hash) {
+        if (($current_num) && ($current_num == $real_num_hash{$k})) {
+            $same_rank++;
         }
-        $top_k_num = $#{$score_lists} unless ($top_k_num);
-        my $ranked_lists = $this->get_ranked_lists($score_lists, $top_k_num);
-        push @lists_lists, $ranked_lists;
-        $i++;
+        else {
+            $j = $j + $same_rank + 1;
+            $same_rank = 0;
+            $current_num = $real_num_hash{$k};
+        }
+        if ((defined $top_k_num) && ($j > $top_k_num)) {
+            $ranked_list[$k - 1] = -1;
+        }
+        else {
+            $ranked_list[$k - 1] = $j;
+        }
     }
-    return \@lists_lists;
+    return \@ranked_list;
 }
 
-sub check_is_valid_lists_lists {
-    my ($this, $lists_lists) = @_;
+sub get_ranked_lists_list {
+    my ($this, $score_lists_list, $top_k_num) = @_;
+    my @lists_list = ();
+    my $i = 0;
+    foreach my $score_list (@{$score_lists_list}) {
+        $top_k_num = ($#{$score_list} + 1) unless ($top_k_num);
+        my $ranked_list = $this->get_ranked_list($score_list, $top_k_num);
+        push @lists_list, $ranked_list;
+        $i++;
+    }
+    return \@lists_list;
+}
+
+sub validate_lists_list {
+    my ($this, $lists_list) = @_;
     my $result = 1;
     my $colmun_count = -1;
-    foreach my $lists (@{$lists_lists}) {
+    foreach my $list (@{$lists_list}) {
         if ($colmun_count > -1) {
-            if ($colmun_count != $#{$lists}) {
+            if ($colmun_count != $#{$list}) {
                 $result = 0;
                 last;
             }
         }
         else {
-            $colmun_count = $#{$lists};
+            $colmun_count = $#{$list};
         }
     }
     return $result;
 }
 
+sub get_bordacount_list {
+    my ($this, $ranked_list, $top_k_num) = @_;
+    my @bordacount_list;
+    $top_k_num = $#{$ranked_list} + 1 unless (defined $top_k_num);
+    foreach my $rank_num (@{$ranked_list}) {
+        my $score = 0;
+        if (($rank_num > 0) && ($rank_num <= $top_k_num)) {
+            $score = $top_k_num - $rank_num + 1;
+        }
+        push @bordacount_list, $score;
+    }
+    return \@bordacount_list;
+}
+
+sub get_bordacount_lists_list {
+    my ($this, $ranked_lists_list, $top_k_num) = @_;
+    my @lists_list = ();
+    my $i = 0;
+    foreach my $rank_list (@{$ranked_lists_list}) {
+        my $bordacount_list = $this->get_bordacount_list($rank_list, $top_k_num);
+        push @lists_list, $bordacount_list;
+    }
+    return \@lists_list;
+}
+
+sub get_weighted_count_list {
+    my ($this, $count_list, $row_num) = @_;
+    my @weighted_count_list = ();
+    foreach my $count_num (@{$count_list}) {
+        my $weighted_count_num = $count_num * $this->{weight}->[$row_num];
+        push @weighted_count_list, $weighted_count_num;
+    }
+    return \@weighted_count_list;
+}
+
+sub get_weighted_count_lists_list {
+    my ($this, $count_lists_list) = @_;
+    my @lists_list = ();
+    my $i = 0;
+    foreach my $count_list (@{$count_lists_list}) {
+        my $weighted_count_list = $this->get_weighted_count_list($count_list, $i);
+        push @lists_list, $weighted_count_list;
+        $i++;
+    }
+    return \@lists_list;
+}
+
+sub get_bordacount_result {
+    my ($this, $bordacount_lists_list) = @_;
+    my @lists_list = ();
+    for (my $i = 0; $i <= $#{$bordacount_lists_list->[0]}; $i++) {
+        my $result = 0;
+        for (my $j = 0; $j <= $#{$bordacount_lists_list}; $j++) {
+            $result = $result + $bordacount_lists_list->[$j]->[$i];
+        }
+        push @lists_list, $result;
+    }
+    return \@lists_list;
+}
+
 sub aggregate {
     my ($this, $score_lists_lists, $top_k_num) = @_;
     my @result = ();
-    return \@result unless ($this->check_is_valid_lists_lists($score_lists_lists));
-
-    my $ranked_lists_lists = $this->get_ranked_lists_lists($score_lists_lists);
-    for (my $item_num = 0; $item_num <= $#{$ranked_lists_lists->[0]}; $item_num++) {
-        my $borda_count = 0;
-        for (my $list_num = 0; $list_num <= $#{$ranked_lists_lists}; $list_num++) {
-            my $score = $top_k_num - $ranked_lists_lists->[$list_num]->[$item_num] + 1;
-            $borda_count += $score if ($score > 0);
-        }
-        push @result, $borda_count;
+    return \@result unless ($this->validate_lists_list($score_lists_lists));
+    my $ranked_lists_list = $this->get_ranked_lists_list($score_lists_lists);
+    my $bordacount_lists_list = $this->get_bordacount_lists_list($ranked_lists_list, $top_k_num);
+    if ((exists $this->{weight}) && (exists $this->{weight}->[0])) {
+        $bordacount_lists_list = $this->get_weighted_count_lists_list($bordacount_lists_list);
     }
+    @result = @{$this->get_bordacount_result($bordacount_lists_list)} if (@{$bordacount_lists_list});
     return \@result;
 }
 
 sub new {
-    my ($class) = @_;
-    my %hash;
+    my ($class, $weight_list) = @_;
+    my %hash = (
+        'weight' => $weight_list,
+    );
     bless \%hash, $class;
 }
 

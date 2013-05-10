@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 10;
+use Test::More tests => 4;
 
 use Algorithm::RankAggregate::BordaCount;
 
@@ -12,26 +12,13 @@ my @ans_01 = (5, 4, 2, 1, 3);
 my @case_02 = (-17.7,  13.0, -5.7, -2.4,  12.9);
 my @ans_02 = (5, 1, 4, 3, 2);
 
-my @case_03 = (-17.7,  13.0, -5.7, -2.4,  12.9);
-my @ans_03_0 = (-1,-1, -1, -1, -1);
-my @ans_03_1 = (-1, 1, -1, -1, -1);
-my @ans_03_2 = (-1, 1, -1, -1,  2);
-my @ans_03_3 = (-1, 1, -1,  3,  2);
-my @ans_03_4 = (-1, 1,  4,  3,  2);
-my @ans_03_5 = ( 5, 1,  4,  3,  2);
+my @case_03 = (-17.7,  13.0, -2.4, -2.4,  12.9);
+my @ans_03 = (5, 1, 3, 3, 2);
+
 
 my $bc = Algorithm::RankAggregate::BordaCount->new();
 
 is_deeply($bc->get_ranked_list(\@case_00), \@ans_00);
 is_deeply($bc->get_ranked_list(\@case_01), \@ans_01);
 is_deeply($bc->get_ranked_list(\@case_02), \@ans_02);
-is_deeply($bc->get_ranked_list(\@case_03, 0), \@ans_03_0);
-is_deeply($bc->get_ranked_list(\@case_03, 1), \@ans_03_1);
-is_deeply($bc->get_ranked_list(\@case_03, 2), \@ans_03_2);
-is_deeply($bc->get_ranked_list(\@case_03, 3), \@ans_03_3);
-is_deeply($bc->get_ranked_list(\@case_03, 4), \@ans_03_4);
-is_deeply($bc->get_ranked_list(\@case_03, 5), \@ans_03_5);
-
-my @case_04 = (-17.7,  13.0, -2.4, -2.4,  12.9);
-my @ans_04 = (5, 1, 3, 3, 2);
-is_deeply($bc->get_ranked_list(\@case_04), \@ans_04);
+is_deeply($bc->get_ranked_list(\@case_03), \@ans_03);

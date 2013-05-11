@@ -1,6 +1,10 @@
+use strict;
+use warnings;
 use inc::Module::Install;
+
 name 'Algorithm-RankAggregate-BordaCount';
 all_from 'lib/Algorithm/RankAggregate/BordaCount.pm';
+author 'Toshinori Sato (@overlast) <overlasting {at} gmail.com>';
 
 # requires '';
 

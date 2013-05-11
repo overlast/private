@@ -4,61 +4,7 @@ use strict;
 use warnings;
 our $VERSION = '0.0.1';
 
-sub get_ranked_list {
-    my ($this, $score_list) = @_;
-    my @ranked_list = ();
-    my %real_num_hash;
-    my $i = 1;
-    foreach my $real_num (@{$score_list}) {
-        $real_num_hash{$i} = $real_num;
-        $i++;
-    }
-    my $current_num = 0;
-    my $same_rank = 0;
-    my $j = 0;
-    foreach my $k (sort {$real_num_hash{$b} <=> $real_num_hash{$a}} keys %real_num_hash) {
-        if (($current_num) && ($current_num == $real_num_hash{$k})) {
-            $same_rank++;
-        }
-        else {
-            $j = $j + $same_rank + 1;
-            $same_rank = 0;
-            $current_num = $real_num_hash{$k};
-        }
-        $ranked_list[$k - 1] = $j;
-    }
-    return \@ranked_list;
-}
-
-sub get_ranked_lists_list {
-    my ($this, $score_lists_list) = @_;
-    my @lists_list = ();
-    my $i = 0;
-    foreach my $score_list (@{$score_lists_list}) {
-        my $ranked_list = $this->get_ranked_list($score_list);
-        push @lists_list, $ranked_list;
-        $i++;
-    }
-    return \@lists_list;
-}
-
-sub validate_lists_list {
-    my ($this, $lists_list) = @_;
-    my $result = 1;
-    my $colmun_count = -1;
-    foreach my $list (@{$lists_list}) {
-        if ($colmun_count > -1) {
-            if ($colmun_count != $#{$list}) {
-                $result = 0;
-                last;
-            }
-        }
-        else {
-            $colmun_count = $#{$list};
-        }
-    }
-    return $result;
-}
+use base qw/Algorithm::RankAggregate/;
 
 sub get_bordacount_list {
     my ($this, $ranked_list, $top_k_num) = @_;
@@ -81,28 +27,6 @@ sub get_bordacount_lists_list {
     foreach my $rank_list (@{$ranked_lists_list}) {
         my $bordacount_list = $this->get_bordacount_list($rank_list, $top_k_num);
         push @lists_list, $bordacount_list;
-    }
-    return \@lists_list;
-}
-
-sub get_weighted_count_list {
-    my ($this, $count_list, $row_num) = @_;
-    my @weighted_count_list = ();
-    foreach my $count_num (@{$count_list}) {
-        my $weighted_count_num = $count_num * $this->{weight}->[$row_num];
-        push @weighted_count_list, $weighted_count_num;
-    }
-    return \@weighted_count_list;
-}
-
-sub get_weighted_count_lists_list {
-    my ($this, $count_lists_list) = @_;
-    my @lists_list = ();
-    my $i = 0;
-    foreach my $count_list (@{$count_lists_list}) {
-        my $weighted_count_list = $this->get_weighted_count_list($count_list, $i);
-        push @lists_list, $weighted_count_list;
-        $i++;
     }
     return \@lists_list;
 }
@@ -131,14 +55,6 @@ sub aggregate {
     }
     @result = @{$this->get_bordacount_result($bordacount_lists_list)} if (@{$bordacount_lists_list});
     return \@result;
-}
-
-sub new {
-    my ($class, $weight_list) = @_;
-    my %hash = (
-        'weight' => $weight_list,
-    );
-    bless \%hash, $class;
 }
 
 1;

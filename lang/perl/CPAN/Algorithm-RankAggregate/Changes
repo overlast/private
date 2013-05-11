@@ -1,4 +1,4 @@
-Revision history for Perl extension Algorithm::RankAggregate::BordaCount
+Revision history for Perl extension Algorithm::RankAggregate
 
 0.0.1    Thu May 10 12:07:00 2013
         - first version of Pure Perl Borda count module

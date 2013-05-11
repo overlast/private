@@ -8,3 +8,6 @@ __DATA__
 Toshinori Sato
 overlasting {at} gmail.com
 Algorithm::RankAggregate::BordaCount
+multi
+borda
+Borda

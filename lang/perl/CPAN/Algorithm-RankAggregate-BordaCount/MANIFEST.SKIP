@@ -19,3 +19,7 @@
 ^\.shipit$
 ^\.git/
 \.sw[po]$
+\.gitignore
+META\.yml
+MYMETA\.yml
+MYMETA\.json

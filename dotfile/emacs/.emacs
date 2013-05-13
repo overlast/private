@@ -91,6 +91,12 @@
 )
 (setq el-get-sources
  '(el-get
+   (:name perl-completion
+          :description "perl-completion: minor mode provides useful features for editing perl codes"
+          :type http
+          :url "http://www.emacswiki.org/emacs/perl-completion.el"
+          :load-path (".")
+          )
    (:name auto-save-buffers
           :description "auto-save-buffers: Saving the buffers automaticaly every N seconds."
           :type http
@@ -283,8 +289,9 @@
 ;======================================================================
 
 (require 'color-theme)
-(color-theme-initialize)
-(color-theme-solarized-dark)
+;(color-theme-initialize)
+;(color-theme-solarized-dark)
+(require 'color-theme-solarized)
 
 ;======================================================================
 ; git-gutter-fringe.el

@@ -292,6 +292,7 @@
 ;(color-theme-initialize)
 ;(color-theme-solarized-dark)
 (require 'color-theme-solarized)
+(load-theme 'solarized-dark t)
 
 ;======================================================================
 ; git-gutter-fringe.el

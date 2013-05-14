@@ -584,7 +584,7 @@
 ;; http://d.hatena.ne.jp/sugyan/20120227/1330343152
 
 (autoload 'cperl-mode "cperl-mode" nil t)
-(add-to-list 'auto-mode-alist '("\.\([pP][Llm]\|psgi\|t\|cgi\)$" . cperl-mode))
+(add-to-list 'auto-mode-alist '("\\.\\([pP][Llm]\\|psgi\\|t\\|cgi\\)$" . cperl-mode))
 (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
 (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
 (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
@@ -610,7 +610,7 @@
      (defvar flymake-perl-err-line-patterns
        '(("\\(.*\\) at \\([^ \n]+\\) line \\([0-9]+\\)[,.\n]" 2 3 nil 1)))
      (defconst flymake-allowed-perl-file-name-masks
-       '("\.\([pP][Llm]\|psgi\|t\|cgi\)$" flymake-perl-init))
+       '("\\.\\([pP][Llm]\\|psgi\\|t\\|cgi\\)$" flymake-perl-init))
 
      (defun flymake-perl-init ()
        (let* ((temp-file (flymake-init-create-temp-buffer-copy

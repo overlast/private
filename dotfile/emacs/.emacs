@@ -86,73 +86,78 @@
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 (unless (require 'el-get nil t)
   (url-retrieve "https://raw.github.com/dimitri/el-get/master/el-get-install.el"
-    (lambda (s) (goto-char (point-max)) (eval-print-last-sexp))
-  )
-)
+                (lambda (s) (goto-char (point-max)) (eval-print-last-sexp))))
+
 (setq el-get-sources
- '(el-get
-   (:name auto-save-buffers
-          :description "auto-save-buffers: Saving the buffers automaticaly every N seconds."
-          :type http
-          :url "http://0xcc.net/misc/auto-save/auto-save-buffers.el"
+      '(el-get
+        (:name perl-completion
+               :description "perl-completion: minor mode provides useful features for editing perl codes"
+               :type git
+               :url "git://github.com/imakado/perl-completion.git"
+               :load-path (".")
+               )
+        (:name auto-save-buffers
+               :description "auto-save-buffers: Saving the buffers automaticaly every N seconds."
+               :type http
+               :url "http://0xcc.net/misc/auto-save/auto-save-buffers.el"
+               :load-path (".")
+               )
+        (:name set-perl5lib
+               :description "set-perl5lib"
+               :type http
+               :url "http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el"
+               :load-path (".")
+               )
+        (:name perlbrew-mini
+               :description "perlbrew-mini"
+               :type git
+               :url "git://github.com/dams/perlbrew-mini.el.git"
+               :load-path (".")
+               )
+        (:name plenv
+               :description "plenv"
+               :type git
+               :url "git://github.com/karupanerura/plenv.el.git"
+               :load-path (".")
+               )
+        (:name ac-python
+               :description "ac-python"
+               :type http
+               :url "http://chrispoole.com/downloads/ac-python.el"
+               :load-path (".")
+               )
+        (:name moccur-edit
+               :description "moccur-edit"
+               :type http
+               :url "http://www.bookshelf.jp/elc/moccur-edit.el"
+               :load-path (".")
+               )
+        (:name direx
+               :description "direx"
+               :type git
+               :url "git://github.com/m2ym/direx-el.git"
+               :load-path (".")
+               )
+        (:name dabbrev-ja
+               :description "dabbrev-ja"
+               :type http
+               :url "http://namazu.org/~tsuchiya/elisp/dabbrev-ja.el"
+               :load-path (".")
+               )
+        (:name dabbrev-highlight
+               :description "dabbrev-highlight"
+               :type http
+               :url "http://www.namazu.org/~tsuchiya/elisp/dabbrev-highlight.el"
           :load-path (".")
           )
-   (:name set-perl5lib
-          :description "set-perl5lib"
-          :type http
-          :url "http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el"
+        (:name dmacro
+               :description "dmacro"
+               :type http
+               :url "http://www.pitecan.com/papers/JSSSTDmacro/dmacro.el"
           :load-path (".")
           )
-   (:name perlbrew-mini
-          :description "perlbrew-mini"
-          :type git
-          :url "git://github.com/dams/perlbrew-mini.el.git"
-          :load-path (".")
-          )
-   (:name plenv
-          :description "plenv"
-          :type git
-          :url "git://github.com/karupanerura/plenv.el.git"
-          :load-path (".")
-          )
-   (:name ac-python
-          :description "ac-python"
-          :type http
-          :url "http://chrispoole.com/downloads/ac-python.el"
-          :load-path (".")
-          )
-   (:name moccur-edit
-          :description "moccur-edit"
-          :type http
-          :url "http://www.bookshelf.jp/elc/moccur-edit.el"
-          :load-path (".")
-          )
-   (:name direx
-          :description "direx"
-          :type git
-          :url "git://github.com/m2ym/direx-el.git"
-          :load-path (".")
-          )
-   (:name dabbrev-ja
-          :description "dabbrev-ja"
-          :type http
-          :url "http://namazu.org/~tsuchiya/elisp/dabbrev-ja.el"
-          :load-path (".")
-          )
-   (:name dabbrev-highlight
-          :description "dabbrev-highlight"
-          :type http
-          :url "http://www.namazu.org/~tsuchiya/elisp/dabbrev-highlight.el"
-          :load-path (".")
-          )
-   (:name dmacro
-          :description "dmacro"
-          :type http
-          :url "http://www.pitecan.com/papers/JSSSTDmacro/dmacro.el"
-          :load-path (".")
-          )
-   )
-)
+        )
+      )
 (el-get 'sync)
 
 ;======================================================================
@@ -283,8 +288,10 @@
 ;======================================================================
 
 (require 'color-theme)
-(color-theme-initialize)
-(color-theme-solarized-dark)
+;(color-theme-initialize)
+;(color-theme-solarized-dark)
+(require 'color-theme-solarized)
+(load-theme 'solarized-dark t)
 
 ;======================================================================
 ; git-gutter-fringe.el
@@ -577,10 +584,11 @@
 ;; http://d.hatena.ne.jp/sugyan/20120227/1330343152
 
 (autoload 'cperl-mode "cperl-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.\\([pP][Llm]\\|psgi\\|t\\|cgi\\)$" . cperl-mode))
+(add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
+(add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
+(add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
 (defalias 'perl-mode 'cperl-mode) ;; show preference for cperl-mode
-(setq auto-mode-alist
-      (append '(("\\.\\(cgi\\|t\\|psgi\\)$" . cperl-mode))
-              auto-mode-alist))
 (eval-after-load "cperl-mode"
   '(progn
      ;; https://github.com/kentaro/perlbrew.el/blob/master/perlbrew.el
@@ -602,7 +610,7 @@
      (defvar flymake-perl-err-line-patterns
        '(("\\(.*\\) at \\([^ \n]+\\) line \\([0-9]+\\)[,.\n]" 2 3 nil 1)))
      (defconst flymake-allowed-perl-file-name-masks
-       '("\\.\\([Pp][Llm]\\|cgi\\|t\\|psgi\\)$" flymake-perl-init))
+       '("\\.\\([pP][Llm]\\|psgi\\|t\\|cgi\\)$" flymake-perl-init))
 
      (defun flymake-perl-init ()
        (let* ((temp-file (flymake-init-create-temp-buffer-copy

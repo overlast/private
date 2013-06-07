@@ -57,6 +57,7 @@
     color-theme-solarized
     flymake-python-pyflakes
     ruby-mode
+    gud
     ))
 (let ((not-installed (loop for x in installing-package-list
                             when (not (package-installed-p x))
@@ -546,8 +547,15 @@
      (push '("\\.cc$" flymake-cc-init) flymake-allowed-file-name-masks)
      (add-hook 'c++-mode-hook
                '(lambda ()
+                  (define-key c-mode-base-map "\C-c\C-c" 'comment-region)
+                  (define-key c-mode-base-map "\C-c\M-c" 'uncomment-region)
+                  (define-key c-mode-base-map "\C-cg"    'gdb)
+                  (define-key c-mode-base-map "\C-cc"    'make)
+                  (define-key c-mode-base-map "\C-ce"    'c-macro-expand)
+                  (define-key c-mode-base-map "\C-ct"    'toggle-source)
+
                   (setq-default tab-width 2 indent-tabs-mode nil) ; Set tab width and replace indent tabsto spaces
-                  (define-key c++-mode-map "\C-c d" 'flymake-display-err-minibuf)
+                  (define-key c++-mode-map "\C-cd" 'flymake-display-err-minibuf)
                   (c-toggle-auto-hungry-state 1) ; inserting newline and indent when you push ';'
                   (define-key c-mode-base-map "\C-m" 'newline-and-indent) ; inserting newline and indent hen you push '\n'
                   (flymake-mode t)
@@ -569,13 +577,70 @@
      (push '("\\.c$" flymake-c-init) flymake-allowed-file-name-masks)
      (add-hook 'c-mode-hook
                '(lambda ()
+
+                  (define-key c-mode-base-map "\C-c\C-c" 'comment-region)
+                  (define-key c-mode-base-map "\C-c\M-c" 'uncomment-region)
+                  (define-key c-mode-base-map "\C-cg"       'gdb)
+                  (define-key c-mode-base-map "\C-cc"       'make)
+                  (define-key c-mode-base-map "\C-ce"       'c-macro-expand)
+                  (define-key c-mode-base-map "\C-ct"        'toggle-source)
+
                   (setq-default tab-width 2 indent-tabs-mode nil) ; Set tab width and replace indent tabsto spaces
-                  (define-key c-mode-map "\C-c d" 'flymake-display-err-minibuf)
+                  (define-key c-mode-map "\C-cd" 'flymake-display-err-minibuf)
                   (c-toggle-auto-hungry-state 1) ; inserting newline and indent when you push ';'
                   (define-key c-mode-base-map "\C-m" 'newline-and-indent) ; inserting newline and indent hen you push '\n'
                   (flymake-mode t)
                   ))
      ))
+
+;;
+;; GDB mode
+(require 'gud)
+(setq gdb-many-windows t)
+(setq gdb-use-separate-io-buffer t)
+(setq gud-tooltip-echo-area nil)
+
+(defun gdb-set-clear-breakpoint ()
+  (interactive)
+  (if (or (buffer-file-name) (eq major-mode 'gdb-assembler-mode))
+      (if (or
+           (let ((start (- (line-beginning-position) 1))
+                 (end (+ (line-end-position) 1)))
+             (catch 'breakpoint
+               (dolist (overlay (overlays-in start end))
+                 (if (overlay-get overlay 'put-break)
+                          (throw 'breakpoint t)))))
+           (eq (car (fringe-bitmaps-at-pos)) 'breakpoint))
+          (gud-remove nil)
+        (gud-break nil))))
+
+(defun gud-kill ()
+  "Kill gdb process."
+  (interactive)
+  (with-current-buffer gud-comint-buffer (comint-skip-input))
+  (kill-process (get-buffer-process gud-comint-buffer)))
+
+(add-hook
+ 'gdb-mode-hook
+ '(lambda ()
+    (interactive)
+    (gud-tooltip-mode t)
+    (gud-def gud-break-main "break main" nil "Set breakpoint at main.")
+
+    (define-key gud-mode-map (kbd "C-c b") 'gud-break-main)
+    (define-key gud-mode-map (kbd "<f5>") 'gud-run);ブレークポイントに会うまで実行
+    (define-key gud-mode-map (kbd "C-c c") 'gud-cont);ブレークポイントに会うまで実行
+    (define-key gud-mode-map (kbd "<f6>") 'gud-next);1行進む
+    (define-key gud-mode-map (kbd "<f7>") 'gud-step);1行進む.関数に入る
+    (define-key gud-mode-map (kbd "<f8>") 'gud-print)
+    (define-key gud-mode-map (kbd "<f9>") 'gdb-set-clear-breakpoint)
+    (define-key gud-mode-map (kbd "C-c w") 'gud-watch);変数の値を見る
+    (define-key gud-mode-map (kbd "C-c t") 'gud-tbreak);一時的なブレークポイント設置
+    (define-key gud-mode-map (kbd "C-c u") 'gud-until);現在の行まで実行
+    (define-key gud-mode-map (kbd "C-c f") 'gud-finish);step out 現在のスタックフレームを抜ける
+    (define-key gud-mode-map (kbd "C-c v") 'gud-pv)
+    (define-key gud-mode-map (kbd "C-c r") 'gud-refresh)
+ ))
 
 ;; Perl mode
 ;; http://ash.roova.jp/perl-to-the-people/emacs-cperl-mode.html

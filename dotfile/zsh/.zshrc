@@ -399,3 +399,9 @@ if [ -d ${HOME}/.rbenv  ] ; then
   export PATH="${HOME}/.rbenv/bin:${PATH}"
   eval "$(rbenv init -)" # == 'export PATH="${HOME}/.rbenv/shims:${PATH}"'
 fi
+
+# OPAM configuration
+. /home/overlast/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+
+# Haskell configuration
+PATH=$PATH:$HOME/.cabal/bin

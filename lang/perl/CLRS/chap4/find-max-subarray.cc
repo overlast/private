@@ -59,6 +59,10 @@ vector<int> find_max_subarray (vector<int> vec, int low, int high){
   }
 }
 
+// problem format is JSON
+// {
+//   "num" : [-13,-3,-25,20,-3,-16,-23,18,20,-7,12,-5,-22,15,-4,7]
+// }
 vector<int> get_input_vec_from_json(string filepath) {
   vector<int> input_vec;
   picojson::value v;

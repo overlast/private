@@ -25,15 +25,15 @@ if File.exist?(ConfigFile)
 end
 
 
-unless %W[java cpp cs].inject(true) {|s,i| s or (options[:language] == i)}
-  puts "Language option is wrong. Default language: java"
-  options[:language] = "java"
+unless %W[java cc cs].inject(true) {|s,i| s or (options[:language] == i)}
+  puts "Language option is wrong. Default language: cc"
+  options[:language] = "cc"
 end
+
 # template
 MAINBODY = open("#{SrcDir}/template/MainTemplate.#{options[:language]}",'r').read
 TESTCODE = open("#{SrcDir}/template/TestTemplate.#{options[:language]}",'r').read
 YOURCODE = open("#{SrcDir}/template/CodeTemplate.#{options[:language]}",'r').read
-
 
 class AirSRM
 
@@ -289,7 +289,7 @@ class AirSRM
       [:parameters, :returns].each do |key|
         #ret[key].gsub!(/String\[\]/, @language == 'cs' ? 'string[]' : 'vector<string>')
         ret[key].gsub!(/String/, 'string')
-        ret[key].gsub!(/(\w+)\[\]/, "vector<\\1>") if @language == 'cpp'
+        ret[key].gsub!(/(\w+)\[\]/, "vector<\\1>") if @language == 'cc'
       end
     end
     ret
@@ -304,7 +304,7 @@ class AirSRM
     #ret.sub!(/\$PARAMETER\$/,parText)
     #ret.sub!(/\$ANSWER\$/,parameter[1]) # fail when the parameter contains a backslash.
 
-    if @language == 'cpp'
+    if @language == 'cc'
       methodargs = ["hogeA"]
       definition[:parameters].count(',').times do |i|
         methodargs << methodargs[i].next
@@ -375,7 +375,7 @@ class AirSRM
 
     arr = cnt.map {|i| i.inner_html}
     methodparms = arr[arr.index("Method signature:")+1].scan(/\((.*?)\)/).flatten.first
-    methodparms.gsub!(/(\w+)\[\]/, "vector<\\1>") if @language == 'cpp'
+    methodparms.gsub!(/(\w+)\[\]/, "vector<\\1>") if @language == 'cc'
 
     np = params.length / returns.length
     main = ''

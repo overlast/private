@@ -21,62 +21,35 @@ static const double EPS = 1e-5;
 typedef long long ll;
 
 class BlackAndWhiteSolitaire {
-public:
+ public:
   int minimumTurns(string cardFront) {
     int result = 0;
-    int ki_b = 0;
-    int ki_w = 0;
-    int gu_b = 0;
-    int gu_w = 0;
-    bool is_ki_w_case = true;
-    for (int i = 0; i < cardFront.size(); i++) {
-      if ((i % 2) == 0) {
-        if (cardFront[i] == 'W') {
-          gu_w++;
-        } else {
-          gu_b++;
-        }
+    int N = cardFront.size();
+    vector<int> org(N), bf(N), wf(N);
+    int bf_count = 0;
+    int wf_count = 0;
+    for (int i = 0; i < N; i++) {
+      if (cardFront[i] == 'B') {
+        org[i] = 1;
       } else {
-        if (cardFront[i] == 'W') {
-          ki_w++;
-        } else {
-          ki_b++;
-        }
+        org[i] = 0;
       }
     }
-
-    if ((ki_b >= ki_w ) && (gu_w >= gu_b)) {
-      is_ki_w_case = false;
-    } else {
-      if (gu_w > ki_w) {
-        is_ki_w_case = false;
+    bf[0] = 1;
+    wf[0] = 0;
+    for (int i = 1; i < N; i++) {
+      bf[i] = !bf[i - 1];
+      wf[i] = !wf[i - 1];
+    }
+    for (int i = 0; i < N; i++) {
+      if (bf[i] != org[i]) {
+        bf_count++;
+      }
+      if (wf[i] != org[i]) {
+        wf_count++;
       }
     }
-
-    for (int i = 0; i < cardFront.size(); i++) {
-      if (is_ki_w_case) {
-        if ((i % 2) == 0) {
-          if (cardFront[i] == 'W') {
-            result++;
-          }
-        } else {
-          if (cardFront[i] == 'B') {
-            result++;
-          }
-        }
-      } else {
-        if ((i % 2) == 0) {
-          if (cardFront[i] == 'B') {
-            result++;
-          }
-        } else {
-          if (cardFront[i] == 'W') {
-            result++;
-          }
-        }
-      }
-    }
-
+    result = min(bf_count, wf_count);
     return result;
   }
 

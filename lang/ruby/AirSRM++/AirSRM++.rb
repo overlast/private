@@ -84,6 +84,21 @@ class AirSRM
   end
 
   def getRoundId
+
+    if File.exist?(XMLFILE) then
+      file_mtime = File.mtime("tc.xml")
+      file_year = file_mtime.year
+      file_month = file_mtime.month
+      file_day = file_mtime.day
+      now = Time.now
+      now_year = now.year
+      now_month = now.month
+      now_day = now.day
+      if ((file_year != now_year) || (file_month != now_month) || (file_day != now_day)) then
+        FileUtils.rm(XMLFILE)
+      end
+    end
+
     if (not File.exist?(XMLFILE)) or (@overwrite)
       print "Saving a round list ... "
       open(XMLFILE,'w') do |file|

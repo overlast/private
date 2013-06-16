@@ -25,31 +25,24 @@ class BlackAndWhiteSolitaire {
   int minimumTurns(string cardFront) {
     int result = 0;
     int N = cardFront.size();
-    vector<int> org(N), bf(N), wf(N);
-    int bf_count = 0;
-    int wf_count = 0;
+    int black = 0;
+    int white = 0;
     for (int i = 0; i < N; i++) {
-      if (cardFront[i] == 'B') {
-        org[i] = 1;
-      } else {
-        org[i] = 0;
+      // compare with WBWBWB...
+      if (i % 2 == 0 && cardFront[i] != 'W') {
+        white++;
+      } else if (i % 2 != 0 && cardFront[i] != 'B') {
+        white++;
+      }
+      // compare with BWBWBW...
+      if (i % 2 == 0 && cardFront[i] != 'B') {
+        black++;
+      } else if (i % 2 != 0 && cardFront[i] != 'W') {
+        black++;
+
       }
     }
-    bf[0] = 1;
-    wf[0] = 0;
-    for (int i = 1; i < N; i++) {
-      bf[i] = !bf[i - 1];
-      wf[i] = !wf[i - 1];
-    }
-    for (int i = 0; i < N; i++) {
-      if (bf[i] != org[i]) {
-        bf_count++;
-      }
-      if (wf[i] != org[i]) {
-        wf_count++;
-      }
-    }
-    result = min(bf_count, wf_count);
+    result = min(white, black);
     return result;
   }
 

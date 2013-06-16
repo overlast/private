@@ -25,23 +25,9 @@ class ShoutterDiv2 {
 public:
   int count(vector <int> s, vector <int> t) {
     int result = 0;
-    multimap<int, int> start;
-    vector<int>::iterator sit = s.begin();
     for (int i = 0; i < (int)s.size(); i++) {
-      start.insert(multimap<int, int>::value_type(s[i], i));
-    }
-    multimap<int, int>::const_iterator mit = start.begin();
-    for (mit = start.begin(); mit != start.end(); mit++) {
-      int start_time = (*mit).first;
-      int end_time_att = (*mit).second;
-      int goal_time = t[end_time_att];
-      multimap<int, int>::const_iterator mit2 = mit;
-      mit2++;
-      for (; mit2 != start.end(); mit2++) {
-        int friend_start_time = (*mit2).first;
-        int friend_end_time_att = (*mit2).second;
-        int friend_goal_time = t[friend_end_time_att];
-        if (((start_time <= friend_goal_time) && (friend_goal_time <= goal_time)) || ((start_time <= friend_start_time) && (friend_start_time <= goal_time))) {
+      for (int j = i + 1; j < (int)s.size(); j++) {
+        if ((min(t[i], t[j]) - max(s[i], s[j])) >= 0) {
           result++;
         }
       }

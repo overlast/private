@@ -24,19 +24,17 @@ class SemiPerfectSquare {
 public:
   string check(int N) {
     string result = "No";
-    int b = 1;
-    int a = N / (b * b);
-    int amari = N % (b * b);
-    while (a > 0) {
-      if (amari == 0) {
-        if (a >= b){
-        } else {
-          result = "Yes";
-        }
-      }
+    int b = 0, a = 0, amari = 0;
+    while (1) {
       b++;
       a = N / (b * b);
+      if (a <= 0) {
+        break;
+      }
       amari = N % (b * b);
+      if ((amari == 0) && (a < b)) {
+        result = "Yes";
+      }
     }
     return result;
   }

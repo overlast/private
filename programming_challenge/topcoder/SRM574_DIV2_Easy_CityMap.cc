@@ -23,33 +23,25 @@ typedef long long ll;
 class CityMap {
 public:
   string getLegend(vector <string> cityMap, vector <int> POIs) {
-    string result = "";
-    int H = cityMap.size();
-    map<char, int> hash;
-    for (int i = 0; i < H; i++) {
-      int W = cityMap[i].length();
-      for(int j = 0; j < W; j++) {
-        char c = cityMap[i][j];
-        if (c != '.') {
-
-          if (hash.count(c) == 0){
-            hash[c] = 1;
-          } else {
-            hash[c] = hash[c] + 1;
+    int h = cityMap.size();
+    int w = cityMap[0].length();
+    int l = POIs.size();
+    string result(l, '?');
+    for (char c = 'A'; c <= 'Z'; c++) {
+      int count = 0;
+      for (int i = 0; i < h; i++) {
+        for(int j = 0; j < w; j++) {
+          if(cityMap[i][j] == c) {
+            count++;
           }
         }
-
       }
-    }
-    map<int, char> numhash;
-    map<char, int>::iterator mitb = hash.begin();
-    map<char, int>::iterator mite = hash.end();
-    for (;mitb != mite; mitb++) {
-      numhash[mitb->second] = mitb->first;
-    }
-    int L = POIs.size();
-    for (int i = 0; i < L; i++) {
-      result = result + numhash[POIs[i]];
+      for (int i = 0; i < l; i++) {
+        if (POIs[i] == count) {
+          result[i] = c;
+          break;
+        }
+      }
     }
     return result;
   }

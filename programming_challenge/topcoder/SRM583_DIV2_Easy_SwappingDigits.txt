@@ -53,5 +53,3 @@ You can leave the original string num unchanged. Note that the result must not c
 "93218910471211292416"
 
 Returns: "13218910471211292496"
-
-

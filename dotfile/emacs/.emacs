@@ -194,6 +194,9 @@
 (add-to-list 'default-frame-alist '(cursor-color . "SlateGray")) ; change the cursor color
 (iswitchb-mode 1) ;; open muffer list in mini buffer (C-x b)
 (global-auto-revert-mode 1) ;; revert file when a file is change in other buffer
+(windmove-default-keybindings)
+
+(global-set-key "\C-xp" (lambda () (interactive) (other-window -1))) ;; Go to previous window with inout C-x p
 
 ;======================================================================
 ;; use ultra rich occur

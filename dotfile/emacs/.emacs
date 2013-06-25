@@ -58,6 +58,7 @@
     flymake-python-pyflakes
     ruby-mode
     gud
+    google-c-style
     ))
 (let ((not-installed (loop for x in installing-package-list
                             when (not (package-installed-p x))
@@ -548,6 +549,12 @@
      (push '("\\.cpp$" flymake-cc-init) flymake-allowed-file-name-masks)
      (push '("\\.hpp$" flymake-cc-init) flymake-allowed-file-name-masks)
      (push '("\\.cc$" flymake-cc-init) flymake-allowed-file-name-masks)
+     ;; google-c-style
+
+     (require 'google-c-style)
+     (add-hook 'c-mode-common-hook 'google-set-c-style)
+     (add-hook 'c-mode-common-hook 'google-make-newline-indent)
+
      (add-hook 'c++-mode-hook
                '(lambda ()
                   (define-key c-mode-base-map "\C-c\C-c" 'comment-region)
@@ -578,6 +585,12 @@
                             (file-name-directory buffer-file-name))))
          (list "gcc" (list "-Wall" "-pedantic" "-Wextra" "-fsyntax-only" local-file))))
      (push '("\\.c$" flymake-c-init) flymake-allowed-file-name-masks)
+
+     ;; google-c-style
+     (require 'google-c-style)
+     (add-hook 'c-mode-common-hook 'google-set-c-style)
+     (add-hook 'c-mode-common-hook 'google-make-newline-indent)
+
      (add-hook 'c-mode-hook
                '(lambda ()
 

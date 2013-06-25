@@ -25,14 +25,10 @@ public:
   int minCost(vector <int> altitude) {
     int result = 0;
     int n = altitude.size();
-    int max = 2000;
-    for (int i = 0; i < n; i++){
-      if (max > altitude[i]) {
-        max = altitude[i];
-      } else {
-        if (altitude[i] > max) {
-          result = result + altitude[i] - max;
-        }
+    for (int i = 1; i < n; i++){
+      if (altitude[i] > altitude[i - 1]) {
+        result = result + altitude[i] - altitude[i - 1];
+        altitude[i] = altitude[i - 1];
       }
     }
     return result;

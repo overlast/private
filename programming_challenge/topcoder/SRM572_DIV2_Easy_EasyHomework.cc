@@ -33,21 +33,16 @@ typedef long long ll;
 class EasyHomework {
 public:
   string determineSign(vector <int> A) {
-    string result = "POSITIVE";
-    int sign = 1;
+    int sign = 0;
     foreach(v, A) {
       if (*v == 0) {
-        result = "ZERO";
-        return result;
+        return "ZERO";
       }
       else if (*v < 0) {
-        sign = sign * -1;
+        sign++;
       }
     }
-    if (sign == -1) {
-      result = "NEGATIVE";
-    }
-    return result;
+    return (sign % 2 == 0) ? "POSITIVE" : "NEGATIVE";
   }
 
 

@@ -24,12 +24,14 @@ class NinjaTurtles {
  public:
   int countOpponents(int P, int K) {
     int res = -1;
-    for (int N = 0; N < 10000000; N++) {
-
-      if (P == ((((int)((N)/K))*3) + (int)((N)/3) )) {
-        res = N;
-        break;
-      }
+    int N = 0;
+    int tmp = ((int)(N/K))*3 + (int)(N/3);
+    while (tmp < P) {
+      N++;
+      tmp = ((int)(N/K))*3 + (int)(N/3);
+    }
+    if (tmp == P) {
+      res = N;
     }
     return res;
   }

@@ -107,7 +107,8 @@
         (:name set-perl5lib
                :description "set-perl5lib"
                :type http
-               :url "http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el"
+               ;:url "http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el"
+               :url "https://gist.github.com/syohex/1333926/raw/cabc5569d82971dc9fedf3198c4ae1dd858381c3/set-perl5lib.el"
                :load-path (".")
                )
         (:name perlbrew-mini
@@ -158,6 +159,10 @@
                :url "http://www.pitecan.com/papers/JSSSTDmacro/dmacro.el"
           :load-path (".")
           )
+        (:name auto-highlight-symbol
+               :type github
+               :pkgname "emacsmirror/auto-highlight-symbol"
+               )
         )
       )
 (el-get 'sync)
@@ -482,6 +487,15 @@
 (ac-config-default)
 
 ;======================================================================
+; Auto Highlight Symbol
+; https://github.com/kmmbvnr/emacs-config/blob/master/elisp/auto-highlight-symbol-config.el
+;======================================================================
+
+(el-get 'sync '(auto-highlight-symbol))
+(require 'auto-highlight-symbol-config)
+(global-auto-highlight-symbol-mode t)
+
+;======================================================================
 ; FlyMake
 ; http://www.emacswiki.org/emacs-zh/FlyMake
 ; http://d.hatena.ne.jp/sugyan/20120103/1325601340
@@ -690,8 +704,12 @@
 
      (defvar flymake-perl-err-line-patterns
        '(("\\(.*\\) at \\([^ \n]+\\) line \\([0-9]+\\)[,.\n]" 2 3 nil 1)))
+
      (defconst flymake-allowed-perl-file-name-masks
        '("\\.\\([pP][Llm]\\|psgi\\|t\\|cgi\\)$" flymake-perl-init))
+     (add-to-list 'flymake-allowed-file-name-masks
+                  '("\\.t$" flymake-perl-init))
+
 
      (defun flymake-perl-init ()
        (let* ((temp-file (flymake-init-create-temp-buffer-copy

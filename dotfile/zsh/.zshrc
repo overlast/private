@@ -400,8 +400,14 @@ if [ -d ${HOME}/.rbenv  ] ; then
   eval "$(rbenv init -)" # == 'export PATH="${HOME}/.rbenv/shims:${PATH}"'
 fi
 
+# ocamlbrew
+# how to install : curl -kL https://raw.github.com/hcarty/ocamlbrew/master/ocamlbrew-install | env OCAMLBREW_FLAGS="-r" bash
 # OPAM configuration
-. /home/overlast/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+if [ -d ${HOME}/ocamlbrew ] ; then
+  export PATH=${HOME}/ocamlbrew/ocaml-4.00.1/bin:$PATH
+  export OPAMROOT=${HOME}/ocamlbrew/ocaml-4.00.1/.opam
+  eval `opam config env`
+fi
 
 # Haskell configuration
 PATH=$PATH:$HOME/.cabal/bin

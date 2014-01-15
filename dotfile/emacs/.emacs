@@ -201,6 +201,8 @@
 (iswitchb-mode 1) ;; open muffer list in mini buffer (C-x b)
 (global-auto-revert-mode 1) ;; revert file when a file is change in other buffer
 (windmove-default-keybindings)
+(setq undo-limit 100000)
+(setq undo-strong-limit 130000)
 
 (global-set-key "\C-xp" (lambda () (interactive) (other-window -1))) ;; Go to previous window with inout C-x p
 

@@ -8,5 +8,5 @@ BASEDIR=`cd $(dirname $0); pwd`
 PDF_PATH=$1
 
 if [ -a ${PDF_PATH} ]; then
-    k2pdfopt ${PDF_PATH} -ocr -ocrlang eng -dev kpw -bp -f2p -1
+    k2pdfopt ${PDF_PATH} -dev kpw -bp -f2p -1
 fi

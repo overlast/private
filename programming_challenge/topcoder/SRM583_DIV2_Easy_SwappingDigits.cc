@@ -21,52 +21,22 @@ using namespace std;
 static const double EPS = 1e-5;
 typedef long long ll;
 
+#define forall(i,a,b)    for(int i=a; i<(int)b; i++)
+
 class SwappingDigits {
 public:
   string minNumber(string num) {
-    cout << num << endl;
-
-    string result;
-    int N = num.length();
-    for (int i = 0; i < N - 1; i++) {
-      char min_num = '\0';
-      int min_att = -1;
-      if ((num[i] == '0') || ((i == 0) && (num[i] == '1'))) {
-        continue;
-      }
-      for (int j = i + 1; j < N; j++) {
-        if (min_num == '\0') {
-          if (num[i] > num[j]) {
-            if ((i == 0) && (num[j] == '0')){
-            } else {
-              min_num = num[j];
-              min_att = j;
-            }
-          }
-        }else {
-          if (num[min_att] >= num[j]) {
-            if ((i == 0) && (num[j] == '0')){
-            } else {
-              min_num = num[j];
-              min_att = j;
-            }
-          }
+    string result = num;
+    forall(i, 0, num.length()) {
+      forall(j, i + 1, num.length()) {
+        if ((i == 0) && (num[j] == '0')) {
+        } else {
+          string tmp_num = num;
+          swap(tmp_num[i], tmp_num[j]);
+          result = min(result, tmp_num);
         }
       }
-      if ((min_num != '\0') && (((i == 0) && (num[min_att] != '0')) || (i != 0))) {
-        char tmp = num[i];
-        num[i] = num[min_att];
-        cout << num << endl;
-        num[min_att] = tmp;
-        cout << num << endl;
-
-        break;
-      } else {
-        min_num = '\0';
-        min_att = -1;
-      }
     }
-    result = num;
     return result;
   }
 

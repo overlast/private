@@ -58,6 +58,7 @@
     flymake-python-pyflakes
     ruby-mode
     gud
+    google-c-style
     ))
 (let ((not-installed (loop for x in installing-package-list
                             when (not (package-installed-p x))
@@ -106,7 +107,8 @@
         (:name set-perl5lib
                :description "set-perl5lib"
                :type http
-               :url "http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el"
+               ;:url "http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el"
+               :url "https://gist.github.com/syohex/1333926/raw/cabc5569d82971dc9fedf3198c4ae1dd858381c3/set-perl5lib.el"
                :load-path (".")
                )
         (:name perlbrew-mini
@@ -157,6 +159,10 @@
                :url "http://www.pitecan.com/papers/JSSSTDmacro/dmacro.el"
           :load-path (".")
           )
+        (:name auto-highlight-symbol
+               :type github
+               :pkgname "emacsmirror/auto-highlight-symbol"
+               )
         )
       )
 (el-get 'sync)
@@ -194,6 +200,11 @@
 (add-to-list 'default-frame-alist '(cursor-color . "SlateGray")) ; change the cursor color
 (iswitchb-mode 1) ;; open muffer list in mini buffer (C-x b)
 (global-auto-revert-mode 1) ;; revert file when a file is change in other buffer
+(windmove-default-keybindings)
+(setq undo-limit 100000)
+(setq undo-strong-limit 130000)
+
+(global-set-key "\C-xp" (lambda () (interactive) (other-window -1))) ;; Go to previous window with inout C-x p
 
 ;======================================================================
 ;; use ultra rich occur
@@ -478,6 +489,15 @@
 (ac-config-default)
 
 ;======================================================================
+; Auto Highlight Symbol
+; https://github.com/kmmbvnr/emacs-config/blob/master/elisp/auto-highlight-symbol-config.el
+;======================================================================
+
+(el-get 'sync '(auto-highlight-symbol))
+(require 'auto-highlight-symbol-config)
+(global-auto-highlight-symbol-mode t)
+
+;======================================================================
 ; FlyMake
 ; http://www.emacswiki.org/emacs-zh/FlyMake
 ; http://d.hatena.ne.jp/sugyan/20120103/1325601340
@@ -545,6 +565,12 @@
      (push '("\\.cpp$" flymake-cc-init) flymake-allowed-file-name-masks)
      (push '("\\.hpp$" flymake-cc-init) flymake-allowed-file-name-masks)
      (push '("\\.cc$" flymake-cc-init) flymake-allowed-file-name-masks)
+     ;; google-c-style
+
+     (require 'google-c-style)
+     (add-hook 'c-mode-common-hook 'google-set-c-style)
+     (add-hook 'c-mode-common-hook 'google-make-newline-indent)
+
      (add-hook 'c++-mode-hook
                '(lambda ()
                   (define-key c-mode-base-map "\C-c\C-c" 'comment-region)
@@ -575,6 +601,12 @@
                             (file-name-directory buffer-file-name))))
          (list "gcc" (list "-Wall" "-pedantic" "-Wextra" "-fsyntax-only" local-file))))
      (push '("\\.c$" flymake-c-init) flymake-allowed-file-name-masks)
+
+     ;; google-c-style
+     (require 'google-c-style)
+     (add-hook 'c-mode-common-hook 'google-set-c-style)
+     (add-hook 'c-mode-common-hook 'google-make-newline-indent)
+
      (add-hook 'c-mode-hook
                '(lambda ()
 
@@ -674,8 +706,12 @@
 
      (defvar flymake-perl-err-line-patterns
        '(("\\(.*\\) at \\([^ \n]+\\) line \\([0-9]+\\)[,.\n]" 2 3 nil 1)))
+
      (defconst flymake-allowed-perl-file-name-masks
        '("\\.\\([pP][Llm]\\|psgi\\|t\\|cgi\\)$" flymake-perl-init))
+     (add-to-list 'flymake-allowed-file-name-masks
+                  '("\\.t$" flymake-perl-init))
+
 
      (defun flymake-perl-init ()
        (let* ((temp-file (flymake-init-create-temp-buffer-copy

@@ -62,6 +62,7 @@
     ag
     wgrep
     wgrep-ag
+    markdown-mode
     ))
 (let ((not-installed (loop for x in installing-package-list
                             when (not (package-installed-p x))
@@ -882,3 +883,13 @@
 (add-hook 'emacs-lisp-common-hook 'flyspell-prog-mode-hooks)
 (add-hook 'python-mode-hook 'flyspell-prog-mode-hooks)
 (add-hook 'ruby-mode-hook 'flyspell-prog-mode-hooks)
+
+;======================================================================
+; Emacs Markdown Mode
+; http://jblevins.org/projects/markdown-mode/
+;======================================================================
+(autoload 'markdown-mode "markdown-mode"
+   "Major mode for editing Markdown files" t)
+(add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))

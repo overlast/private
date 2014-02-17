@@ -167,6 +167,10 @@
                :type github
                :pkgname "emacsmirror/auto-highlight-symbol"
                )
+        (:name longlines-jp
+               :type httpb
+               :pkgname "http://www.emacswiki.org/emacs/download/longlines-jp.el"
+               )
         )
       )
 (el-get 'sync)
@@ -884,12 +888,21 @@
 (add-hook 'python-mode-hook 'flyspell-prog-mode-hooks)
 (add-hook 'ruby-mode-hook 'flyspell-prog-mode-hooks)
 
+
+;======================================================================
+; Long Lines Jp Mode
+; http://www.emacswiki.org/emacs-ja/LongLinesJpMode
+;======================================================================
+;(el-get 'sync '(longline-jp))
+;(longlines-jp t)
+;(longlines-show-hard-newlines t)
+
 ;======================================================================
 ; Emacs Markdown Mode
 ; http://jblevins.org/projects/markdown-mode/
 ;======================================================================
-(autoload 'markdown-mode "markdown-mode"
+(autoload 'gfm-mode "markdown-mode"
    "Major mode for editing Markdown files" t)
 (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))

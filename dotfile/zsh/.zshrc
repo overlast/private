@@ -409,5 +409,41 @@ if [ -d ${HOME}/ocamlbrew ] ; then
   eval `opam config env`
 fi
 
+# scalaenv
+# how to install : cd; git clone git://github.com/mazgi/scalaenv.git ~/.scalaenv
+if [ -d ${HOME}/.scalaenv  ] ; then
+  export PATH="${HOME}/.scalaenv/bin:${PATH}"
+  eval "$(scalaenv init - zsh)" # == 'export PATH="${HOME}/.scalaenv/shims:${PATH}"'
+fi
+
+# sbtenv
+# how to install : cd; git clone git://github.com/mazgi/sbtenv.git ~/.sbtenv
+if [ -d ${HOME}/.sbtenv  ] ; then
+  export PATH="${HOME}/.sbtenv/bin:${PATH}"
+  eval "$(sbtenv init - zsh)" # == 'export PATH="${HOME}/.sbtenv/shims:${PATH}"'
+fi
+
+# playenv
+# how to install : cd; git clone git://github.com/mazgi/playenv.git ~/.playenv
+if [ -d ${HOME}/.playenv  ] ; then
+  export PATH="${HOME}/.playenv/bin:${PATH}"
+  eval "$(playenv init - zsh)" # == 'export PATH="${HOME}/.playenv/shims:${PATH}"'
+fi
+
+
+
+
+
+
+# gvm
+# how to install :curl -s get.gvmtool.net | bash
+#if [ -d ${HOME}/.gvm  ] ; then
+ # export PATH="${HOME}/.gvm/bin:${PATH}"
+#fi
+
+
 # Haskell configuration
 PATH=$PATH:$HOME/.cabal/bin
+
+#THIS MUST BE AT THE END OF THE FILE FOR GVM TO WORK!!!
+[[ -s "/home/overlast/.gvm/bin/gvm-init.sh" ]] && source "/home/overlast/.gvm/bin/gvm-init.sh"

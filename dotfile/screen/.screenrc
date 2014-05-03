@@ -34,12 +34,18 @@ idle 1200
 blankerprg /usr/games/fortune starwars
 
 #splitの設定
-bind x command -c REGION
-bind -c REGION 2 split
-bind -c REGION 1 only
-bind -c REGION 0 remove
-bind -c REGION o focus
-bind -c REGION \^ resize
+# operate regions like emacs
+bind x command -c escape-x-map
+bind -c escape-x-map 2 split
+bind -c escape-x-map 3 split -v
+bind -c escape-x-map o focus
+bind -c escape-x-map 1 only
+bind -c escape-x-map 0 remove
+bind -c escape-x-map } resize +10
+bind -c escape-x-map { resize -10
+bind -c escape-x-map j resize +1
+bind -c escape-x-map k resize -1
+bind -c escape-x-map + resize =
 
 # Emacs の yank っぽいペースト法(C-z C-y)
 bind ^y paste .

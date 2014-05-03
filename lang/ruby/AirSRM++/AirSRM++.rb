@@ -51,7 +51,8 @@ class AirSRM
     end
     @agent.agent.http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 #    @agent.agent.http.ssl_version = "SSLv3"
-
+    @agent.agent.user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.75 Safari/535.7'
+    @agent.agent.read_timeout = 100
 
     FileUtils.mkdir_p("#{SrcDir}/problem") unless FileTest.exist?("#{SrcDir}/problem")
 

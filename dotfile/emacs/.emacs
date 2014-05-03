@@ -59,6 +59,10 @@
     ruby-mode
     gud
     google-c-style
+    ag
+    wgrep
+    wgrep-ag
+    markdown-mode
     ))
 (let ((not-installed (loop for x in installing-package-list
                             when (not (package-installed-p x))
@@ -107,7 +111,8 @@
         (:name set-perl5lib
                :description "set-perl5lib"
                :type http
-               :url "http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el"
+               ;:url "http://svn.coderepos.org/share/lang/elisp/set-perl5lib/set-perl5lib.el"
+               :url "https://gist.github.com/syohex/1333926/raw/cabc5569d82971dc9fedf3198c4ae1dd858381c3/set-perl5lib.el"
                :load-path (".")
                )
         (:name perlbrew-mini
@@ -158,6 +163,14 @@
                :url "http://www.pitecan.com/papers/JSSSTDmacro/dmacro.el"
           :load-path (".")
           )
+        (:name auto-highlight-symbol
+               :type github
+               :pkgname "emacsmirror/auto-highlight-symbol"
+               )
+        (:name longlines-jp
+               :type httpb
+               :pkgname "http://www.emacswiki.org/emacs/download/longlines-jp.el"
+               )
         )
       )
 (el-get 'sync)
@@ -196,6 +209,8 @@
 (iswitchb-mode 1) ;; open muffer list in mini buffer (C-x b)
 (global-auto-revert-mode 1) ;; revert file when a file is change in other buffer
 (windmove-default-keybindings)
+(setq undo-limit 100000)
+(setq undo-strong-limit 130000)
 
 (global-set-key "\C-xp" (lambda () (interactive) (other-window -1))) ;; Go to previous window with inout C-x p
 
@@ -296,7 +311,8 @@
 ;(color-theme-initialize)
 ;(color-theme-solarized-dark)
 (require 'color-theme-solarized)
-(load-theme 'solarized-dark t)
+;(load-theme 'solarized-dark t)
+(load-theme 'solarized-light t)
 
 ;======================================================================
 ; git-gutter-fringe.el
@@ -367,6 +383,42 @@
 (require 'direx)
 (global-set-key (kbd "C-x C-j") 'direx:jump-to-directory-other-window)
 ;(global-set-key (kbd "C-x C-j") 'direx:jump-to-directory)
+
+;======================================================================
+; ag.el and wgrep-ag.el
+;  http://github.com/ggreer/the_silver_searcher#installation
+;======================================================================
+
+(require 'ag)
+(custom-set-variables
+ '(ag-highlight-search t)  ; 検索結果の中の検索語をハイライトする
+ '(ag-reuse-window 'nil)   ; 現在のウィンドウを検索結果表示に使う
+ '(ag-reuse-buffers 'nil)) ; 現在のバッファを検索結果表示に使う
+(require 'wgrep-ag)
+(autoload 'wgrep-ag-setup "wgrep-ag")
+(add-hook 'ag-mode-hook 'wgrep-ag-setup)
+;; agの検索結果バッファで"r"で編集モードに。
+;; C-x C-sで保存して終了、C-x C-kで保存せずに終了
+(define-key ag-mode-map (kbd "r") 'wgrep-change-to-wgrep-mode)
+;; キーバインドを適当につけておくと便利。"\C-xg"とか
+(global-set-key "\C-xg" 'ag)
+;; ag開いたらagのバッファに移動するには以下をつかう
+(defun my/filter (condp lst)
+  (delq nil
+        (mapcar (lambda (x) (and (funcall condp x) x)) lst)))
+(defun my/get-buffer-window-list-regexp (regexp)
+  "Return list of windows whose buffer name matches regexp."
+  (my/filter #'(lambda (window)
+              (string-match regexp
+               (buffer-name (window-buffer window))))
+          (window-list)))
+(global-set-key "\C-xg"
+                #'(lambda ()
+                    (interactive)
+                    (call-interactively 'ag)
+                    (select-window ; select ag buffer
+                     (car (my/get-buffer-window-list-regexp "^\\*ag ")))))
+
 
 ;======================================================================
 ; popwin.el
@@ -482,6 +534,15 @@
 (ac-config-default)
 
 ;======================================================================
+; Auto Highlight Symbol
+; https://github.com/kmmbvnr/emacs-config/blob/master/elisp/auto-highlight-symbol-config.el
+;======================================================================
+
+(el-get 'sync '(auto-highlight-symbol))
+(require 'auto-highlight-symbol-config)
+(global-auto-highlight-symbol-mode t)
+
+;======================================================================
 ; FlyMake
 ; http://www.emacswiki.org/emacs-zh/FlyMake
 ; http://d.hatena.ne.jp/sugyan/20120103/1325601340
@@ -491,7 +552,8 @@
 (require 'flymake-cursor)
 
 (set-face-background 'flymake-errline "red4")
-(set-face-foreground 'flymake-errline "black")
+;(set-face-foreground 'flymake-errline "black")
+(set-face-foreground 'flymake-errline "LightPink")
 (set-face-background 'flymake-warnline "yellow")
 (set-face-foreground 'flymake-warnline "black")
 
@@ -690,8 +752,12 @@
 
      (defvar flymake-perl-err-line-patterns
        '(("\\(.*\\) at \\([^ \n]+\\) line \\([0-9]+\\)[,.\n]" 2 3 nil 1)))
+
      (defconst flymake-allowed-perl-file-name-masks
        '("\\.\\([pP][Llm]\\|psgi\\|t\\|cgi\\)$" flymake-perl-init))
+     (add-to-list 'flymake-allowed-file-name-masks
+                  '("\\.t$" flymake-perl-init))
+
 
      (defun flymake-perl-init ()
        (let* ((temp-file (flymake-init-create-temp-buffer-copy
@@ -823,3 +889,22 @@
 (add-hook 'emacs-lisp-common-hook 'flyspell-prog-mode-hooks)
 (add-hook 'python-mode-hook 'flyspell-prog-mode-hooks)
 (add-hook 'ruby-mode-hook 'flyspell-prog-mode-hooks)
+
+
+;======================================================================
+; Long Lines Jp Mode
+; http://www.emacswiki.org/emacs-ja/LongLinesJpMode
+;======================================================================
+;(el-get 'sync '(longline-jp))
+;(longlines-jp t)
+;(longlines-show-hard-newlines t)
+
+;======================================================================
+; Emacs Markdown Mode
+; http://jblevins.org/projects/markdown-mode/
+;======================================================================
+(autoload 'gfm-mode "markdown-mode"
+   "Major mode for editing Markdown files" t)
+(add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))

@@ -390,22 +390,62 @@ fi
 # how to install : cd; git clone git://github.com/yyuu/pyenv.git .pyenv
 if [ -d ${HOME}/.pyenv  ] ; then
   export PATH="${HOME}/.pyenv/bin:${PATH}"
-  eval "$(pyenv init -)" # == 'export PATH="${HOME}/.pyenv/shims:${PATH}"'
+  eval "$(pyenv init - zsh)" # == 'export PATH="${HOME}/.pyenv/shims:${PATH}"'
 fi
 
 # rbenv
 # how to install : cd; git clone git://github.com/sstephenson/rbenv.git ~/.rbenv
 if [ -d ${HOME}/.rbenv  ] ; then
   export PATH="${HOME}/.rbenv/bin:${PATH}"
-  eval "$(rbenv init -)" # == 'export PATH="${HOME}/.rbenv/shims:${PATH}"'
+  eval "$(rbenv init - zsh)" # == 'export PATH="${HOME}/.rbenv/shims:${PATH}"'
 fi
 
+# ocamlbrew
+# how to install : curl -kL https://raw.github.com/hcarty/ocamlbrew/master/ocamlbrew-install | env OCAMLBREW_FLAGS="-r" bash
 # OPAM configuration
-. /home/overlast/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+if [ -d ${HOME}/ocamlbrew ] ; then
+  export PATH=${HOME}/ocamlbrew/ocaml-4.00.1/bin:$PATH
+  export OPAMROOT=${HOME}/ocamlbrew/ocaml-4.00.1/.opam
+  eval `opam config env`
+fi
+
+# scalaenv
+# how to install : cd; git clone git://github.com/mazgi/scalaenv.git ~/.scalaenv
+if [ -d ${HOME}/.scalaenv  ] ; then
+  export PATH="${HOME}/.scalaenv/bin:${PATH}"
+  eval "$(scalaenv init - zsh)" # == 'export PATH="${HOME}/.scalaenv/shims:${PATH}"'
+fi
+
+# sbtenv
+# how to install : cd; git clone git://github.com/mazgi/sbtenv.git ~/.sbtenv
+if [ -d ${HOME}/.sbtenv  ] ; then
+  export PATH="${HOME}/.sbtenv/bin:${PATH}"
+  eval "$(sbtenv init - zsh)" # == 'export PATH="${HOME}/.sbtenv/shims:${PATH}"'
+fi
+
+# playenv
+# how to install : cd; git clone git://github.com/mazgi/playenv.git ~/.playenv
+if [ -d ${HOME}/.playenv  ] ; then
+  export PATH="${HOME}/.playenv/bin:${PATH}"
+  eval "$(playenv init - zsh)" # == 'export PATH="${HOME}/.playenv/shims:${PATH}"'
+fi
+
+
+
+
+
+
+# gvm
+# how to install :curl -s get.gvmtool.net | bash
+#if [ -d ${HOME}/.gvm  ] ; then
+ # export PATH="${HOME}/.gvm/bin:${PATH}"
+#fi
+
 
 # Haskell configuration
 PATH=$PATH:$HOME/.cabal/bin
 
+<<<<<<< HEAD
 use-java () {
     MYOS="$(uname)" # get os name
     case $MYOS in
@@ -414,3 +454,7 @@ use-java () {
         *) ;;
     esac
 }
+=======
+#THIS MUST BE AT THE END OF THE FILE FOR GVM TO WORK!!!
+[[ -s "/home/overlast/.gvm/bin/gvm-init.sh" ]] && source "/home/overlast/.gvm/bin/gvm-init.sh"
+>>>>>>> 0b9fae150fd6e76c5be4a3c24e3eae309b677072

@@ -430,11 +430,6 @@ if [ -d ${HOME}/.playenv  ] ; then
   eval "$(playenv init - zsh)" # == 'export PATH="${HOME}/.playenv/shims:${PATH}"'
 fi
 
-
-
-
-
-
 # gvm
 # how to install :curl -s get.gvmtool.net | bash
 #if [ -d ${HOME}/.gvm  ] ; then
@@ -443,18 +438,22 @@ fi
 
 
 # Haskell configuration
-PATH=$PATH:$HOME/.cabal/bin
+if [ -d ${HOME}/.cabal  ] ; then
+    export PATH=$PATH:$HOME/.cabal/bin
+fi
 
-<<<<<<< HEAD
+
+function setjdk {
+    pathtojava=$(readlink -e /usr/bin/javac)
+    export JAVA_HOME=${pathtojava%/*/*}
+}
+
 use-java () {
     MYOS="$(uname)" # get os name
     case $MYOS in
-        Linux) alias foo='/path/to/linux/bin/foo';;
+        Linux) setjdk ;;
         Darwin) export JAVA_HOME=`/usr/libexec/java_home -v 1.$1` ;;
         *) ;;
     esac
 }
-=======
-#THIS MUST BE AT THE END OF THE FILE FOR GVM TO WORK!!!
-[[ -s "/home/overlast/.gvm/bin/gvm-init.sh" ]] && source "/home/overlast/.gvm/bin/gvm-init.sh"
->>>>>>> 0b9fae150fd6e76c5be4a3c24e3eae309b677072
+use-java

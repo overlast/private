@@ -306,7 +306,8 @@
 ;(color-theme-initialize)
 ;(color-theme-solarized-dark)
 (require 'color-theme-solarized)
-(load-theme 'solarized-dark t)
+;(load-theme 'solarized-dark t)
+(load-theme 'solarized-light t)
 
 ;======================================================================
 ; git-gutter-fringe.el
@@ -546,7 +547,8 @@
 (require 'flymake-cursor)
 
 (set-face-background 'flymake-errline "red4")
-(set-face-foreground 'flymake-errline "black")
+;(set-face-foreground 'flymake-errline "black")
+(set-face-foreground 'flymake-errline "LightPink")
 (set-face-background 'flymake-warnline "yellow")
 (set-face-foreground 'flymake-warnline "black")
 

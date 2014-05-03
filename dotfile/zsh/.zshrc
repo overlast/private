@@ -405,3 +405,12 @@ fi
 
 # Haskell configuration
 PATH=$PATH:$HOME/.cabal/bin
+
+use-java () {
+    MYOS="$(uname)" # get os name
+    case $MYOS in
+        Linux) alias foo='/path/to/linux/bin/foo';;
+        Darwin) export JAVA_HOME=`/usr/libexec/java_home -v 1.$1` ;;
+        *) ;;
+    esac
+}

@@ -137,6 +137,17 @@ sub _get_spot_url_list {
     return $url_list;
 }
 
+sub _is_rent_house_list_url {
+    my ($url) = @_;
+    my $is_rent_house = 0;
+    if (($url =~ m|phonebook/M21101/|) ||
+        ($url =~ m|phonebook/M21102/|) ||
+        ($url =~ m|phonebook/M21103/|)) {
+        $is_rent_house = 1;
+    }
+    return $is_rent_house;
+}
+
 sub _output_all_seed {
     my ($domain) = @_;
     my $root_url = "http://$domain/phonebook/";
@@ -175,6 +186,7 @@ sub _output_all_seed {
 
     unless (-f $town_spot_url_file_path) {
         foreach my $cate_pref_town_url (@$cate_pref_town_url_list) {
+
             $cate_pref_town_url =~ s|\n||;
             my $town_spot_file_name = &_get_content_file_name_using_url($cate_pref_town_url);
             my $town_spot_file_path = $town_spot_dir_path."/".$town_spot_file_name;
@@ -204,6 +216,7 @@ sub _output_all_seed {
         open my $tsuf_in, '<:utf8', $town_spot_url_file_path;
         while (my $town_spot_url = <$tsuf_in>) {
             $town_spot_url =~ s|\n||;
+            next if (&_is_rent_house_list_url($town_spot_url));
             print Dump $town_spot_url;
             my $town_spot_file_name = &_get_content_file_name_using_url($town_spot_url);
             my $town_spot_file_path = $town_spot_dir_path."/".$town_spot_file_name;
@@ -221,6 +234,7 @@ sub _output_all_seed {
         open my $tsuf_in, '<:utf8', $town_spot_url_file_path;
         while (my $town_spot_url = <$tsuf_in>) {
             $town_spot_url =~ s|\n||;
+            next if (&_is_rent_house_list_url($town_spot_url));
             print Dump $town_spot_url;
             my $town_spot_file_name = &_get_content_file_name_using_url($town_spot_url);
             my $town_spot_file_path = $town_spot_dir_path."/".$town_spot_file_name;

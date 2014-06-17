@@ -44,7 +44,7 @@ sub _mkdirp {
 
 
 sub _sleep_1_sec {
-    for (my $i=0; $i <= 5000000; $i++) {}
+    for (my $i=0; $i <= 2500000; $i++) {}
 }
 
 sub _complete_url_prefix {
@@ -146,6 +146,8 @@ sub _get_spot_file_name_using_url {
     if ($url) {
         if ($url =~ m|/phonebook/(M[0-9]{5})/([0-9]+)/(.+)/$|) {
             $file_name = $1."-".$2."-".$3.".html";
+        } else {
+            warnf "$url can't crawl";
         }
     }
     return $file_name;
@@ -155,7 +157,7 @@ sub _get_spot_file_dir_using_url {
     my ($url) = @_;
     my $file_dir = "";
     if ($url) {
-        if ($url =~ m|/phonebook/(M[0-9]{5})/([0-9]{2})([0-9]+)/(.+)/$|) {
+        if ($url =~ m|/phonebook/(M[0-9]{5})/([0-9]{2})([0-9]{3})/(.+)/$|) {
             $file_dir = $data_root_path."/spot_data/".$1."/".$2;
         }
     }
@@ -177,7 +179,7 @@ sub _get_spot_file_path_using_url {
 sub _did_already_clawled {
     my ($file_path) = @_;
     my $_did_clawled = 0;
-    if (-f $file_path) {
+    if ((-f $file_path) && (-s $file_path)) {
         $_did_clawled = 1;
     }
     return $_did_clawled;
@@ -192,7 +194,9 @@ sub _crawl_all_seed_url {
             $seed_line =~ s|\n||;
             my $seed_url = &_strip_url($seed_line);
             my $seed_file_path = &_get_spot_file_path_using_url($seed_url);
-            unless (&_did_already_clawled($seed_file_path)) {
+            if (&_did_already_clawled($seed_file_path)) {
+                infof "Skip $seed_file_path";
+            } else {
                 infof "Crawl $seed_file_path";
                 my $content = &_get_content($seed_url);
                 &_dump_to_file($seed_file_path, $content) if ($content);

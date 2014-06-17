@@ -89,21 +89,24 @@ sub _get_content {
     my ($url) = @_;
     my $content = "";
     my $max_retry_num = 3;
-    while ($max_retry_num) {
-        $max_retry_num--;
-        my $res = $furl->get($url);
+    eval {
+        while ($max_retry_num) {
+            $max_retry_num--;
+            my $res = $furl->get($url);
 
-        &_sleep_1_sec();
+            &_sleep_1_sec();
 
-        next unless $res->is_success;
-        $content = $res->content;
-        $content =~ s|\n{1,}||g;
-        $content =~ s|[\t]| |g;
-        $content =~ s|　| |g;
-        $content =~ s| {1,}| |g;
-        $content =~ s|\n |\n|g;
-        $content = Encode::decode_utf8($content) unless utf8::is_utf8($content);
-    }
+            next unless $res->is_success;
+            $content = $res->content;
+            $content =~ s|\n{1,}||g;
+            $content =~ s|[\t]| |g;
+            $content =~ s|　| |g;
+            $content =~ s| {1,}| |g;
+            $content =~ s|\n |\n|g;
+            $content = Encode::decode_utf8($content) unless utf8::is_utf8($content);
+        }
+    };
+    warnf $@ if ($@);
     return $content;
 }
 

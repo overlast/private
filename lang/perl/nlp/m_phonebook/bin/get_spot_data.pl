@@ -188,7 +188,7 @@ sub _did_already_clawled {
 sub _is_target_url {
     my ($url,) = @_;
     my $is_target = 1;
-    my $out_of_target_reg = '(?:phonebook/M41001|phonebook/M21101/|phonebook/M21102/|phonebook/M21103/)';
+    my $out_of_target_reg = '(?:phonebook/M41001|phonebook/M12001|phonebook/M21101/|phonebook/M21102/|phonebook/M21103/)';
     if ($url =~ m|$out_of_target_reg|) {
         $is_target = 0;
     }

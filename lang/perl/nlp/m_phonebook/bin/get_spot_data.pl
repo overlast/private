@@ -44,7 +44,7 @@ sub _mkdirp {
 
 
 sub _sleep_1_sec {
-    for (my $i=0; $i <= 1250000; $i++) {}
+    for (my $i=0; $i <= 625000; $i++) {}
 }
 
 sub _complete_url_prefix {

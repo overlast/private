@@ -185,6 +185,17 @@ sub _did_already_clawled {
     return $_did_clawled;
 }
 
+sub _is_target_url {
+    my ($url,) = @_;
+    my $is_target = 1;
+    my $out_of_target_reg = '(?:phonebook/M41001|phonebook/M21101/|phonebook/M21102/|phonebook/M21103/)';
+    if ($url =~ m|$out_of_target_reg|) {
+        $is_target = 0;
+    }
+    return $is_target;
+}
+
+
 sub _crawl_all_seed_url {
     my ($seed_path,) = @_;
     my $seed_url_list_paths = &_get_seed_paths($seed_path);
@@ -193,13 +204,18 @@ sub _crawl_all_seed_url {
         while (my $seed_line = <$in_handle>) {
             $seed_line =~ s|\n||;
             my $seed_url = &_strip_url($seed_line);
+            next unless (&_is_target_url($seed_url));
             my $seed_file_path = &_get_spot_file_path_using_url($seed_url);
             if (&_did_already_clawled($seed_file_path)) {
                 infof "Skip $seed_file_path";
             } else {
                 infof "Crawl $seed_file_path";
                 my $content = &_get_content($seed_url);
-                &_dump_to_file($seed_file_path, $content) if ($content);
+                if ($content) {
+                    &_dump_to_file($seed_file_path, $content);
+                } else {
+                    warnf "Can't get the content data of $seed_file_path";
+                }
             }
         }
         close $in_handle;

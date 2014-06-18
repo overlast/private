@@ -152,27 +152,20 @@ sub _build_spot_data_map {
     }
 
 
+    my ($genres, $genre_id, $pref_id, $pref_surface, $city_id, $city_surface);
+
 
     if ($spot_tel_tag =~ m|<th class=\"spot-tag-span\">ジャンル</th><td>(.+?)</td></tr><tr><th class=\"spot-tag-span\">施設所在地</th><td><a href=\"/phonebook/(M[0-9]+)/([0-9]+)/\" title=\".+?\" data-id=\"link-area-pref\" class=\"spot-tag-link\">(.+?)</a><a href=\"/phonebook/M[0-9]+/([0-9]+)/\" title=\".+?\" data-id=\"link-area-city\" class=\"spot-tag-link\">(.+?)</a><a href=\"/phonebook/.+?/\" title=\".+?\" class=\"spot-tag-link\">.+駅</a>|) {
-        my ($genres, $genre_id, $pref_id, $pref_surface, $city_id, $city_surface) = ($1, $2, $3, $4, $5, $6);
-        my @genre_id_arr = ();
-        my @genre_surface_arr = ();
-        while ($genres =~ m|<a href=\"/phonebook/(M[0-9]+)/\" title=\"(.+?)\" data-id|g) {
-            my ($tmp_id, $tmp_surface) = ($1, $2);
-            push @genre_id_arr, $tmp_id;
-            push @genre_surface_arr, $tmp_surface;
-        }
-        my $genre_ids_csv = join ',', @genre_id_arr;
-        my $genre_surface_csv = join ',', @genre_surface_arr;
-        $spot_data_map->{genre_ids_csv} = $genre_ids_csv if ($genre_ids_csv);
-        $spot_data_map->{genre_surface_csv} = $genre_surface_csv if ($genre_surface_csv);
-        $spot_data_map->{genre_id} = $genre_id if ($genre_id);
-        $spot_data_map->{pref_id} = $pref_id if ($pref_id);
-        $spot_data_map->{pref_surface} = $pref_surface if ($pref_surface);
-        $spot_data_map->{city_id} = $city_id if ($city_id);
-        $spot_data_map->{city_surface} = $city_surface if ($city_surface);
+
+        ($genres, $genre_id, $pref_id, $pref_surface, $city_id, $city_surface) = ($1, $2, $3, $4, $5, $6);
+
     } elsif ($spot_tel_tag =~ m|<th class=\"spot-tag-span\">ジャンル</th><td>(.+?)</td></tr><tr><th class=\"spot-tag-span\">施設所在地</th><td><a href=\"/phonebook/(M[0-9]+)/([0-9]+)/\" title=\".+?\" data-id=\"link-area-pref\" class=\"spot-tag-link\">(.+?)</a><a href=\"/phonebook/M[0-9]+/([0-9]+)/\" title=\".+?\" data-id=\"link-area-city\" class=\"spot-tag-link\">(.+?)</a>|) {
-        my ($genres, $genre_id, $pref_id, $pref_surface, $city_id, $city_surface) = ($1, $2, $3, $4, $5, $6);
+
+        ($genres, $genre_id, $pref_id, $pref_surface, $city_id, $city_surface) = ($1, $2, $3, $4, $5, $6);
+
+    }
+
+    if ($genres) {
         my @genre_id_arr = ();
         my @genre_surface_arr = ();
         while ($genres =~ m|<a href=\"/phonebook/(M[0-9]+)/\" title=\"(.+?)\" data-id|g) {

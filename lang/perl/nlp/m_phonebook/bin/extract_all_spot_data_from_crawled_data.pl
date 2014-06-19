@@ -117,7 +117,6 @@ sub _extract_spot_tel_tag {
     return $table;
 }
 
-
 sub _build_spot_data_map {
     my ($spot_basic_table, $spot_tel_tag) = @_;
     my $spot_data_map = {};
@@ -141,15 +140,12 @@ sub _build_spot_data_map {
                 $surface = $1;
             }
         }
-
-
         if (($spot_basic_table =~ m|<tr><th>名称</th>|) && !(($surface))) {
             warnf "Can&t extract spot_name $spot_basic_table"; die;
         }
     }
 
     {
-
         if ($spot_basic_table =~ m|<tr><th>住所</th><td>〒([0-9]+\-[0-9]+)<br />(.+?)<div class=\"arrow_navi\"><a href=\"/m/([0-9\.]+)_([0-9\.]+)_.+?/poi=(.+?)/\" class=\"spot-table-link\" data-analytics=\"phonebook/detail/to_navi_to_poi\">この場所への行き方を見る</a></div></td></tr>|) {
             ($post_code, $address, $latitude, $longitude, $spot_id) = ($1, $2, $3, $4, $5);
         } elsif ($spot_basic_table =~ m|<tr><th>住所</th><td>〒([0-9]+\-[0-9]+)<br />(.+?)<div class=\"arrow_navi\"><a href=\"/m/([0-9\.]+)_([0-9\.]+)_.+?/poi=(.+?)/\" data-analytics=\"phonebook/detail/to_navi_to_poi\" class=\"spot-table-link\">この場所への行き方を見る</a></div></td></tr>|) {
@@ -161,16 +157,13 @@ sub _build_spot_data_map {
         } elsif ($spot_basic_table =~ m|<tr><th>住所</th><td><span rel="v:address">(.+?)<span style="display:none;"><span property="v:region">.+?</span><span property="v:locality">.+?</span><span property="v:street-address">.*?</span><span xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"><span content="[0-9\.]+?" property="geo:lat"></span><span content="[0-9\.]+?" property="geo:long"></span></span></span></span><br /><a data-analytics="phonebook/detail/to_navi_to_poi" href="/m/([0-9\.]+)_([0-9\.]+)_.+?/poi=(.+?)/" class="spot-table-link">この場所への行き方を見る</a></td></tr><tr>|) {
             ($address, $latitude, $longitude, $spot_id) = ($1, $2, $3, $4,);
         }
-
         if (($spot_basic_table =~ m|<tr><th>住所</th>|) && !(($address) && ($latitude) && ($longitude) && ($spot_id))) {
             warnf "$post_code, $address, $latitude, $longitude, $spot_id";
             warnf "Can&t extract address $spot_basic_table"; die;
         }
-
     }
 
     {
-
         if ($spot_basic_table =~ m|<tr><th>電話番号</th><td><p class="spot-basic-tel"><span class="spot-basic-tel-num"> ?([0-9\-]+?) ?</span>.*?</p></td></tr><tr>|) {
             $tel = $1;
         } elsif ($spot_basic_table =~ m|<tr><th>電話番号</th><td> ?([0-9\-]+?) ?</td></tr><tr>|) {
@@ -185,7 +178,6 @@ sub _build_spot_data_map {
             warnf "Can&t extract tel $spot_basic_table"; die;
         }
     }
-
     {
         if ($spot_basic_table =~ m|<tr><th>営業時間</th><td>(.+?)</td></tr><tr>|) {
             $open_time = $1;
@@ -194,21 +186,17 @@ sub _build_spot_data_map {
             warnf "Can&t extract open_time $spot_basic_table"; die;
         }
     }
-
     {
         if ($spot_basic_table =~ m|<tr><th>最寄駅<br />（直線距離）</th><td><a href=\"/station/(.+?)/" class=\"spot-table-link\" data-analytics=\"phonebook/detail/to_stationdir\">(.+?)</a><span class=\"spot-table-ex\">（(.+?)ｍ）</span>|) {
             ($nearest_station_id, $nearest_station_surface, $distance_from_nearest_station) = ($1, $2, $3,);
         } elsif ($spot_basic_table =~ m|<tr><th>最寄駅</th><td>(.+?駅)</td></tr><tr>|) {
             $nearest_station_surface = $1;
         }
-
         if (($spot_basic_table =~ m|<tr><th>最寄駅</th>|) && !($nearest_station_surface)) {
             warnf "Can&t extract nearest_station $spot_basic_table"; die;
         }
     }
-
     {
-
         if ($spot_basic_table =~ m|<tr><th>評価</th><td><p class=\"spot-value clearfix\"><span class=\"spot-value-ttl\">食べログ</span><span class=\"spot-value-img\"><span style=\"background-position:[0-9]+px 0;\" class=\"spot-value-img-bar\"><img src=\"/f/mapion/phonebook/img/RankArea.gif\" width=\"75\" height=\"15\" /></span></span><span class=\"spot-value-num\"> ([0-9\.]+) </span></p><p class=\"spot-value clearfix\"><span class=\"spot-value-ttl\">ロケタッチグルメ</span><span class=\"spot-value-img\"><span style=\"background-position:[0-9]+px 0;\" class=\"spot-value-img-bar\"><img src=\"/f/mapion/phonebook/img/RankArea.gif\" width=\"75\" height=\"15\" /></span></span><span class=\"spot-value-num\"> ([0-9\.]+) </span></p></td></tr><tr>|) {
             ($tabelog_score, $loctouch_score) = ($1, $2);
         }
@@ -216,7 +204,6 @@ sub _build_spot_data_map {
             warnf "Can&t extract reputations $spot_basic_table"; die;
         }
     }
-
     if (($surface) && ($address) && (($yomi) || ($tel))) {
         $spot_data_map->{surface} = $surface if ($surface);
         $spot_data_map->{yomi} = $yomi if ($yomi);
@@ -232,7 +219,6 @@ sub _build_spot_data_map {
             my $tels_csv = join ',', @tels_arr;
             $spot_data_map->{tels_csv} = $tels_csv if ($tels_csv);
         }
-
 
         $spot_data_map->{nearest_station_id} = $nearest_station_id if ($nearest_station_id);
         $spot_data_map->{nearest_station_surface} = $nearest_station_surface if ($nearest_station_surface);
@@ -253,9 +239,6 @@ sub _build_spot_data_map {
             warnf "Can&t extract genres $spot_tel_tag"; die;
         }
     }
-
-
-    #<tr><th class="spot-tag-span">施設所在地</th><td><a href="/phonebook/M01011003C/01/" title="北海道 ケンタッキーフライドチキン" data-id="link-area-pref" class="spot-tag-link">北海道</a><a href="/phonebook/M01011003C/01203/" title="小樽市 ケンタッキーフライドチキン" data-id="link-area-city" class="spot-tag-link">小樽市</a><a href="/phonebook/M01011003C/01203/ST20099/" title="小樽築港駅 ケンタッキーフライドチキン" class="spot-tag-link">小樽築港駅</a></td></tr>
     {
         if ($spot_tel_tag =~ m|<tr><th class=\"spot-tag-span\">施設所在地</th><td><a href=\"/phonebook/M.+?/([0-9]+)/\" title=\".+?\" data-id=\"link-area-pref\" class=\"spot-tag-link\">(.+?)</a><a href=\"/phonebook/M.+?/([0-9]+)/\" title=\".+?\" data-id=\"link-area-city\" class=\"spot-tag-link\">(.+?)</a><a href=\"/phonebook/.+?/\" title=\".+?\" class=\"spot-tag-link\">.+駅</a>|) {
             ($pref_id, $pref_surface, $city_id, $city_surface) = ($1, $2, $3, $4);
@@ -266,7 +249,6 @@ sub _build_spot_data_map {
             warnf "Can&t extract pref_id $spot_tel_tag"; die;
         }
     }
-
     {
         if ($spot_tel_tag =~ m|<tr><th class=\"spot-tag-span\">タグ</th><td>(.+?)</td></tr>|) {
             $tags = $1;
@@ -275,7 +257,6 @@ sub _build_spot_data_map {
             warnf "Can&t extract tags $spot_tel_tag"; die;
         }
     }
-
     {
         if ($spot_tel_tag =~ m|<tr><th class=\"spot-tag-span\">チェーン</th><td>(.+?)</td></tr>|) {
             $chain_info = $1;
@@ -284,7 +265,6 @@ sub _build_spot_data_map {
             warnf "Can&t extract chain_info $spot_tel_tag"; die;
         }
     }
-
     if ($genres) {
         my @genre_id_arr = ();
         my @genre_surface_arr = ();
@@ -330,10 +310,8 @@ sub _build_spot_data_map {
         my $normalized_val = &_normalize_string($val);
         $spot_data_map->{$key} = $normalized_val;
     }
-
     return $spot_data_map;
 }
-
 
 sub _normalize_string {
     my ($str) = @_;
@@ -341,8 +319,6 @@ sub _normalize_string {
     $str =~ s|[ ]+$||g;
     return $str;
 }
-
-
 
 sub _extract_spot_data {
     my ($html_path) = @_;
@@ -373,8 +349,6 @@ sub _output_spot_data_json {
     }
     return;
 }
-
-
 
 sub _extract_all_spot_data {
     my ($root_path) = @_;

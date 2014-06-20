@@ -6,6 +6,7 @@ use utf8;
 use autodie;
 use Encode;
 use YAML;
+use URI; # Furl.pm will use URI.pm
 use Furl;
 use FindBin;
 use File::Slurp;

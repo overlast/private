@@ -10,6 +10,7 @@ use FindBin;
 use File::Slurp;
 use Path::Class;
 use JSON;
+use HTML::Entities;
 
 use constant LM_DEBUG => $ENV{LM_DEBUG};
 use Log::Minimal qw/debugf infof warnf critf/; # $ENV{LM_LEVEL}
@@ -325,9 +326,19 @@ sub _build_spot_data_map {
 
 sub _normalize_string {
     my ($str) = @_;
-    $str =~ s|^[ ]+||g;
-    $str =~ s|[ ]+$||g;
-    return $str;
+    my $normalized = "";
+    if ((defined $str) && ($str ne "")) {
+        $normalized = $str;
+        $normalized = decode_entities($normalized);
+        $normalized =~ s|\(|\（|g;
+        $normalized =~ s|\)|\）|g;
+        $normalized =~ tr/０-９Ａ-Ｚａ-ｚ/0-9A-Za-z/;
+        $normalized =~ s|　| |g;
+        $normalized =~ s| {1,}| |g;
+        $normalized =~ s|^[ ]+(.+?)$|$1|g;
+        $normalized =~ s|^(.+?)[ ]+$|$1|g;
+    }
+    return $normalized;
 }
 
 sub _extract_spot_data {

@@ -94,11 +94,21 @@ sub _has_information {
     return $has_information;
 }
 
+sub _has_spot_basic_table {
+    my ($content) = @_;
+    my $has_information = 0;
+    my $table_column_reg = '(?:<tr><th>よみがな</th><td>|<tr><th>電話番号</th><td>)';
+    if ($content =~ m|$table_column_reg|) {
+        $has_information = 1;
+    }
+    return $has_information;
+}
+
 sub _extract_spot_basic_table {
     my ($html,) = @_;
     my $table = "";
     if ($html) {
-        while ($html =~ m|<div class=\"spot-basic\">(.+</table>)</div>|g) {
+        while ($html =~ m|<div class=\"spot-basic\">(.+?</table>)</div>|g) {
             my $tmp_table = $1;
             if (&_has_information($tmp_table)) {
                 $table = $tmp_table;
@@ -330,12 +340,15 @@ sub _extract_spot_data {
         my $spot_tel_tag = &_extract_spot_tel_tag($content);
         if (($spot_basic_table) && ($spot_tel_tag)) {
             $data = &_build_spot_data_map($spot_basic_table, $spot_tel_tag);
-            print Dump $data;
+            #print Dump $data;
             unless ((exists $data->{surface}) || (exists $data->{genre_surface_csv})) {
                 print Dump $spot_basic_table, $spot_tel_tag; die;
             }
-        } else {
+        } elsif (&_has_spot_basic_table($content)) {
             warnf "$script_prefix Error is occurred by $html_path when extracting basic_table or spot_tel_tag";
+            print Dump  $html_path;
+            print Dump $spot_basic_table,  $spot_tel_tag;
+            die;
         }
     }
     return $data;

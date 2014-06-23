@@ -203,17 +203,19 @@ sub _is_target_url {
 sub _crawl_all_seed_url {
     my ($seed_path,) = @_;
     my $seed_url_list_paths = &_get_seed_paths($seed_path);
+    my $count = 0;
     foreach my $seed_url_list_path (@$seed_url_list_paths) {
         open my $in_handle, '<:utf8', $seed_url_list_path;
         while (my $seed_line = <$in_handle>) {
             $seed_line =~ s|\n||;
             my $seed_url = &_strip_url($seed_line);
+            $count++;
             next unless (&_is_target_url($seed_url));
             my $seed_file_path = &_get_spot_file_path_using_url($seed_url);
             if (&_did_already_clawled($seed_file_path)) {
                 infof "Skip $seed_file_path";
             } else {
-                infof "Crawl $seed_file_path";
+                infof "Crawl $count $seed_file_path";
                 my $content = &_get_content($seed_url);
                 if ($content) {
                     &_dump_to_file($seed_file_path, $content);

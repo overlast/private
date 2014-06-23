@@ -95,7 +95,7 @@ sub _get_content {
             $max_retry_num--;
             my $res = $furl->get($url);
 
-            &_sleep_1_sec();
+#            &_sleep_1_sec();
 
             next unless $res->is_success;
             $content = $res->content;

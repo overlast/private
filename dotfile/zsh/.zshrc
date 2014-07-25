@@ -457,3 +457,20 @@ use-java () {
     esac
 }
 use-java
+
+# keep SSH_AUTH_SOCK 
+
+set agent = "$HOME/tmp/ssh-agent-$USER"
+if ($?SSH_AUTH_SOCK) then
+    if (! -S $SSH_AUTH_SOCK) unsetenv SSH_AUTH_SOCK
+endif
+if ($?SSH_AUTH_SOCK) then
+    if ($SSH_AUTH_SOCK =~ /tmp/*/agent.[0-9]*) then
+	ln -snf "$SSH_AUTH_SOCK" $agent && setenv SSH_AUTH_SOCK $agent
+	endif
+else if (-S $agent) then
+	    setenv SSH_AUTH_SOCK $agent
+else
+	echo "no ssh-agent"
+endif
+unset agent

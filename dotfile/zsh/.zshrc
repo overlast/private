@@ -21,7 +21,7 @@ colors
 
 # デフォルトの補完機能を有効
 # cd f/b/b[TAB]でcd foooo/barrr/bazzzと展開される
-autoload -U compinit && compinit
+autoload -U compinit && compinit -u
 
 # http://news.mynavi.jp/column/zsh/005/index.html
 setopt auto_cd

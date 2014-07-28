@@ -460,17 +460,86 @@ use-java
 
 # keep SSH_AUTH_SOCK 
 
-set agent = "$HOME/tmp/ssh-agent-$USER"
-if ($?SSH_AUTH_SOCK) then
-    if (! -S $SSH_AUTH_SOCK) unsetenv SSH_AUTH_SOCK
-endif
-if ($?SSH_AUTH_SOCK) then
-    if ($SSH_AUTH_SOCK =~ /tmp/*/agent.[0-9]*) then
-	ln -snf "$SSH_AUTH_SOCK" $agent && setenv SSH_AUTH_SOCK $agent
-	endif
-else if (-S $agent) then
-	    setenv SSH_AUTH_SOCK $agent
+# Find a usable agent
+function ssh-reagent () {
+    ls /tmp/|grep ssh-
+    if [ $? -eq 0  ]; then
+	export SSH_AUTH_SOCK=$(find /tmp/ssh-* -name agent\* -printf ‘'%T@ %p\n' | sort -k 1nr | sed 's/^[^ ]* //' | head -n 1)
+	if $(ssh-add -l > /dev/null) ; then
+	    echo Found working SSH Agent:
+	    ssh-add -l
+	    return
+	else
+	    echo "Cannot find ssh agent – maybe you should reconnect and forward it?"
+	    export SSH_AUTH_SOCK=""
+	fi
+    else 
+	echo "Cannot find ssh agent – maybe you should reconnect and forward it"
+	export SSH_AUTH_SOCK=""
+    fi
+}
+
+function exec-ssh-agent () {
+  eval `ssh-agent` > ~/.ssh-agent.tmp
+  MY_SSH_AGENT_PID=`cat ~/.ssh-agent.tmp|cut -d" " -f3`
+  rm -f ~/.ssh-agent.tmp
+  if [ -s ~/.ssh/id_rsa ]; then 
+      ssh-add ~/.ssh/id_rsa
+  fi
+  if [ -s ~/.ssh/id_rsa.team-1 ]; then 
+      ssh-add ~/.ssh/id_rsa.team-1
+  fi
+}
+
+agent="$HOME/tmp/.ssh-agent-`hostname`"
+ENV_SSH_AUTH_SOCK=`env|grep "SSH_AUTH_SOCK"`
+
+if [ "$ENV_SSH_AUTH_SOCK" != "" ];then
+    if [ "$SSH_AUTH_SOCK" != "" ];then
+	if [ ! -S "$SSH_AUTH_SOCK" ]; then
+	    export SSH_AUTH_SOCK=""
+	    if [ -s $agent ]; then
+		rm $agent
+	    fi
+	fi
+    fi
+fi
+
+if [ "$SSH_AUTH_SOCK" != "" ];then
+    if [ "$SSH_AUTH_SOCK" = "SSH_AUTH_SOCK=" ];then
+	ssh-reagent
+	if [ -s $agent ]; then
+	    rm $agent
+	fi
+    fi
 else
-	echo "no ssh-agent"
-endif
-unset agent
+    ssh-reagent
+    if [ -s $agent ]; then
+	rm $agent
+    fi
+fi
+
+if [ "$SSH_AUTH_SOCK" != "" ];then
+    if [ "$SSH_AUTH_SOCK" = "SSH_AUTH_SOCK=" ];then
+	exec-ssh-agent
+	if [ -s $agent ]; then
+	    rm $agent
+	fi
+    fi
+else
+    exec-ssh-agent
+    if [ -s $agent ]; then
+	rm $agent
+    fi
+fi
+
+if [ -S "$agent" ]; then
+    export SSH_AUTH_SOCK=$agent
+elif [ ! -S "$SSH_AUTH_SOCK" ]; then
+    #export SSH_AUTH_SOCK=$agent
+    echo "no ssh-agent"
+elif [ ! -L "$SSH_AUTH_SOCK" ]; then
+    ln -snf "$SSH_AUTH_SOCK" $agent && export SSH_AUTH_SOCK=$agent
+fi
+
+

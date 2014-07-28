@@ -458,10 +458,9 @@ use-java () {
 }
 use-java
 
-# keep SSH_AUTH_SOCK 
-
-# Find a usable agent
+# To keep SSH_AUTH_SOCK 
 function ssh-reagent () {
+    # Find a usable agent
     ls /tmp/|grep ssh-
     if [ $? -eq 0  ]; then
 	export SSH_AUTH_SOCK=$(find /tmp/ssh-* -name agent\* -printf ‘'%T@ %p\n' | sort -k 1nr | sed 's/^[^ ]* //' | head -n 1)
@@ -480,57 +479,40 @@ function ssh-reagent () {
 }
 
 function exec-ssh-agent () {
-  eval `ssh-agent` > ~/.ssh-agent.tmp
-  MY_SSH_AGENT_PID=`cat ~/.ssh-agent.tmp|cut -d" " -f3`
-  rm -f ~/.ssh-agent.tmp
-  if [ -s ~/.ssh/id_rsa ]; then 
-      ssh-add ~/.ssh/id_rsa
-  fi
-  if [ -s ~/.ssh/id_rsa.team-1 ]; then 
-      ssh-add ~/.ssh/id_rsa.team-1
-  fi
+    eval `ssh-agent` > ~/.ssh-agent.tmp
+    MY_SSH_AGENT_PID=`cat ~/.ssh-agent.tmp|cut -d" " -f3`
+    rm -f ~/.ssh-agent.tmp
+    if [ -s ~/.ssh/id_rsa ]; then 
+	ssh-add ~/.ssh/id_rsa
+    fi
+    if [ -s ~/.ssh/id_rsa.team-1 ]; then 
+	ssh-add ~/.ssh/id_rsa.team-1
+    fi
+}
+
+function remove-file () {
+    FILE_PATH=$1 
+    if [ -s $FILE_PATH ]; then
+	rm $FILE_PATH
+    fi
 }
 
 agent="$HOME/tmp/.ssh-agent-`hostname`"
 ENV_SSH_AUTH_SOCK=`env|grep "SSH_AUTH_SOCK"`
 
-if [ "$ENV_SSH_AUTH_SOCK" != "" ];then
-    if [ "$SSH_AUTH_SOCK" != "" ];then
-	if [ ! -S "$SSH_AUTH_SOCK" ]; then
-	    export SSH_AUTH_SOCK=""
-	    if [ -s $agent ]; then
-		rm $agent
-	    fi
-	fi
-    fi
+if [ "$ENV_SSH_AUTH_SOCK" != "" ] && [ "$SSH_AUTH_SOCK" != "" ] && [ ! -S "$SSH_AUTH_SOCK" ]; then
+    export SSH_AUTH_SOCK=""
+    remove-file $agent
 fi
 
-if [ "$SSH_AUTH_SOCK" != "" ];then
-    if [ "$SSH_AUTH_SOCK" = "SSH_AUTH_SOCK=" ];then
-	ssh-reagent
-	if [ -s $agent ]; then
-	    rm $agent
-	fi
-    fi
-else
+if [ "$SSH_AUTH_SOCK" = "" ] || [ "$SSH_AUTH_SOCK" = "SSH_AUTH_SOCK=" ];then
     ssh-reagent
-    if [ -s $agent ]; then
-	rm $agent
-    fi
+    remove-file $agent
 fi
 
-if [ "$SSH_AUTH_SOCK" != "" ];then
-    if [ "$SSH_AUTH_SOCK" = "SSH_AUTH_SOCK=" ];then
-	exec-ssh-agent
-	if [ -s $agent ]; then
-	    rm $agent
-	fi
-    fi
-else
+if [ "$SSH_AUTH_SOCK" = "" ] || [ "$SSH_AUTH_SOCK" = "SSH_AUTH_SOCK=" ];then
     exec-ssh-agent
-    if [ -s $agent ]; then
-	rm $agent
-    fi
+    remove-file $agent
 fi
 
 if [ -S "$agent" ]; then

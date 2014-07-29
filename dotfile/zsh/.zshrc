@@ -21,7 +21,7 @@ colors
 
 # デフォルトの補完機能を有効
 # cd f/b/b[TAB]でcd foooo/barrr/bazzzと展開される
-autoload -U compinit && compinit
+autoload -U compinit && compinit -u
 
 # http://news.mynavi.jp/column/zsh/005/index.html
 setopt auto_cd
@@ -457,3 +457,71 @@ use-java () {
     esac
 }
 use-java
+
+# To keep SSH_AUTH_SOCK 
+function ssh-reagent () {
+    # Find a usable agent
+    ls /tmp/|grep ssh-
+    if [ $? -eq 0  ]; then
+	export SSH_AUTH_SOCK=$(find /tmp/ssh-* -name agent\* -printf ‘'%T@ %p\n' | sort -k 1nr | sed 's/^[^ ]* //' | head -n 1)
+	if $(ssh-add -l > /dev/null) ; then
+	    echo Found working SSH Agent:
+	    ssh-add -l
+	    return
+	else
+	    echo "Cannot find ssh agent – maybe you should reconnect and forward it?"
+	    export SSH_AUTH_SOCK=""
+	fi
+    else 
+	echo "Cannot find ssh agent – maybe you should reconnect and forward it"
+	export SSH_AUTH_SOCK=""
+    fi
+}
+
+function exec-ssh-agent () {
+    eval `ssh-agent` > ~/.ssh-agent.tmp
+    MY_SSH_AGENT_PID=`cat ~/.ssh-agent.tmp|cut -d" " -f3`
+    rm -f ~/.ssh-agent.tmp
+    if [ -s ~/.ssh/id_rsa ]; then 
+	ssh-add ~/.ssh/id_rsa
+    fi
+    if [ -s ~/.ssh/id_rsa.team-1 ]; then 
+	ssh-add ~/.ssh/id_rsa.team-1
+    fi
+}
+
+function remove-file () {
+    FILE_PATH=$1 
+    if [ -s $FILE_PATH ]; then
+	rm $FILE_PATH
+    fi
+}
+
+agent="$HOME/tmp/.ssh-agent-`hostname`"
+ENV_SSH_AUTH_SOCK=`env|grep "SSH_AUTH_SOCK"`
+
+if [ "$ENV_SSH_AUTH_SOCK" != "" ] && [ "$SSH_AUTH_SOCK" != "" ] && [ ! -S "$SSH_AUTH_SOCK" ]; then
+    export SSH_AUTH_SOCK=""
+    remove-file $agent
+fi
+
+if [ "$SSH_AUTH_SOCK" = "" ] || [ "$SSH_AUTH_SOCK" = "SSH_AUTH_SOCK=" ];then
+    ssh-reagent
+    remove-file $agent
+fi
+
+if [ "$SSH_AUTH_SOCK" = "" ] || [ "$SSH_AUTH_SOCK" = "SSH_AUTH_SOCK=" ];then
+    exec-ssh-agent
+    remove-file $agent
+fi
+
+if [ -S "$agent" ]; then
+    export SSH_AUTH_SOCK=$agent
+elif [ ! -S "$SSH_AUTH_SOCK" ]; then
+    #export SSH_AUTH_SOCK=$agent
+    echo "no ssh-agent"
+elif [ ! -L "$SSH_AUTH_SOCK" ]; then
+    ln -snf "$SSH_AUTH_SOCK" $agent && export SSH_AUTH_SOCK=$agent
+fi
+
+

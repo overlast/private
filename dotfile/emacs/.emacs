@@ -45,7 +45,6 @@
     browse-kill-ring
     auto-complete
     color-theme
-    melpa
     wdired
     session
 ;    zlc
@@ -74,9 +73,6 @@
     (dolist (pkg not-installed)
       (package-install pkg))
     (byte-recompile-directory elpa-dir 0)))
-
-; melpa.el
-(require 'melpa)
 
 ;======================================================================
 ; control the messages of byte-compile-warnings

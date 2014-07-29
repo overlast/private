@@ -63,6 +63,7 @@
     wgrep
     wgrep-ag
     markdown-mode
+    yasnippet
     ))
 (let ((not-installed (loop for x in installing-package-list
                             when (not (package-installed-p x))
@@ -543,6 +544,19 @@
 (global-auto-highlight-symbol-mode t)
 
 ;======================================================================
+; yasnippet
+; http://shibayu36.hatenablog.com/entry/2012/12/18/224535
+;======================================================================
+
+(require 'yasnippet)
+
+(setq yas-snippet-dirs '("~/.emacs.d/snippets"))
+(custom-set-variables '(yas-trigger-key "TAB"))
+
+ (yas-reload-all)
+;(yas-global-mode 1)
+
+;======================================================================
 ; FlyMake
 ; http://www.emacswiki.org/emacs-zh/FlyMake
 ; http://d.hatena.ne.jp/sugyan/20120103/1325601340
@@ -808,6 +822,7 @@
 
                                   (perl-completion-mode t)
                                   (flymake-perl-load)
+                                  (yas-minor-mode)
                                   ))
      ))
 

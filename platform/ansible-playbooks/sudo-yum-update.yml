@@ -1,0 +1,6 @@
+- hosts: all
+  user: overlast
+  sudo: True
+  roles:
+    - devtools
+    - yum_update

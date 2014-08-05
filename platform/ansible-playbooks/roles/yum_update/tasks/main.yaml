@@ -1,0 +1,6 @@
+---
+- name: Update installed yum packages
+  shell: |
+    yum update -y | grep -c "^Nothing to do" || :
+  register: result
+  changed_when: result.stdout == "0"

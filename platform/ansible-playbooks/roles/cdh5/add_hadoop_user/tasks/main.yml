@@ -1,0 +1,19 @@
+---
+- name: Create hadoop group
+  group: name=hadoop state=present gid={{GID}}
+
+- name: Create hadoop user
+  user: name=hadoop group=hadoop shell={{SHELL}} password={{PASSWORD}} uid={{UID}} state=present
+
+- name: chmod 755 /home/hadoop
+  file: path=/home/hadoop/ state=directory owner=hadoop group=hadoop mode=0755
+
+- name: Create .ssh directory of hadoop user
+  file: path=/home/hadoop/.ssh state=directory owner=hadoop group=hadoop mode=0700
+
+- name: Copy SSH-keys of hadoop user
+  copy: src=hadoop/sshkeys/{{item}} dest=/home/hadoop/.ssh/{{item}} owner=hadoop group=hadoop mode=600
+  with_items:
+  - id_rsa
+  - id_rsa.pub
+  - authorized_keys

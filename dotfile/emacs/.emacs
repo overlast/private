@@ -43,6 +43,7 @@
     helm
     popwin
     browse-kill-ring
+    el-get 
     auto-complete
     color-theme
     wdired

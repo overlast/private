@@ -1,0 +1,5 @@
+- hosts: all
+  user: overlast
+  sudo: True
+  roles:
+    - cdh5/add_hadoop_user

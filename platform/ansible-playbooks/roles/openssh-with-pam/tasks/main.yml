@@ -1,0 +1,84 @@
+---
+- name: Install rpmdevtools
+  yum: name={{item}} state=present
+  with_items:
+    - pam-devel
+    - rpm-build
+    - zlib-devel
+    - krb5-devel
+    - rpmdevtools
+    - fprintd-pam
+
+- name: Create ~/.rpmbuild
+  shell: rpmdev-setuptree
+
+- name: Download {{OPENSSH_TGZ_FILE_NAME}}
+  get_url: url={{OPENSSH_TGZ_FILE_URL}} dest=/root/rpmbuild/SOURCES/{{OPENSSH_TGZ_FILE_NAME}} mode=755
+
+- name: Download {{OPENSSH_ACM_FILE_NAME}}
+  get_url: url={{OPENSSH_TGZ_FILE_URL}} dest=/root/rpmbuild/SOURCES/{{OPENSSH_ASC_FILE_NAME}} mode=755
+
+- name: Check SHA1 digest value
+  shell: openssl dgst -sha1 /root/rpmbuild/SOURCES/{{OPENSSH_TGZ_FILE_NAME}}| grep {{OPENSSH_TGZ_FILE_DIGEST}}
+  register: command_result
+
+- name: Extract
+  shell: cd /root/rpmbuild/SOURCES/ &&
+         tar xfz /root/rpmbuild/SOURCES/{{OPENSSH_TGZ_FILE_NAME}} {{OPENSSH_TGZ_DIR_NAME}}/contrib/redhat/openssh.spec &&
+         chown sshd:sshd {{OPENSSH_TGZ_DIR_NAME}}/contrib/redhat/openssh.spec &&
+         cp {{OPENSSH_TGZ_DIR_NAME}}/contrib/redhat/openssh.spec /root/rpmbuild/SPECS/
+
+- name: disable both askpass options
+  shell: sed -i -e "s/%define no_gnome_askpass 0/%define no_gnome_askpass 1/g" {{item}} &&
+         sed -i -e "s/%define no_x11_askpass 0/%define no_x11_askpass 1/g" {{item}} &&
+         sed -i -e "s/%define build6x 0/%define build6x 1/g" {{item}} &&
+         sed -i -e "s/BuildPreReq/BuildRequires/g" {{item}}
+  with_items:
+     -  /root/rpmbuild/SPECS/openssh.spec
+
+- name: Build RPM package
+  shell: cd /root/rpmbuild/SPECS/; rpmbuild -ba --define 'dist .el6' openssh.spec
+
+- name: Update openssh and openssh-client
+#  shell: yum install -y /root/rpmbuild/RPMS/x86_64/openssh-server-6.6p1-1.x86_64.rpm /root/rpmbuild/RPMS/x86_64/openssh-clients-6.6p1-1.x86_64.rpm /root/rpmbuild/RPMS/x86_64/openssh-6.6p1-1.x86_64.rpm
+  yum: name={{item}} state=present
+  with_items:
+    - /root/rpmbuild/RPMS/x86_64/openssh-server-6.6p1-1.x86_64.rpm
+    - /root/rpmbuild/RPMS/x86_64/openssh-clients-6.6p1-1.x86_64.rpm
+    - /root/rpmbuild/RPMS/x86_64/openssh-6.6p1-1.x86_64.rpm
+
+- name: Recovery /root/.ssh/authorized_keys using /root/.ssh/authorized_keys.rpmsave
+  shell: cp /root/.ssh/authorized_keys.rpmsave /root/.ssh/authorized_keys; chown root:root /root/.ssh/authorized_keys; chmod 600 /root/.ssh/authorized_keys
+
+- name: Install /etc/sshd_config from rpmbuild/BUILD/
+  shell: cp /root/rpmbuild/BUILD/openssh-6.6p1/sshd_config /etc/ssh/sshd_config; chown root:root /etc/ssh/sshd_config; chmod 600 /etc/ssh/sshd_config
+
+- name: Set sshd_config parameter
+  shell: sed -i -e "s/#Protocol 2/Protocol 2/g" {{item}} &&
+         sed -i -e "s/#HostKey \/etc\/ssh\/ssh_host_dsa_key/HostKey \/etc\/ssh\/ssh_host_dsa_key/g" {{item}} &&
+         sed -i -e "s/#LoginGraceTime 2m/LoginGraceTime 1m/g" {{item}} &&
+         sed -i -e "s/#PermitRootLogin yes/PermitRootLogin yes/g" {{item}} &&
+         sed -i -e "s/#StrictModes yes/StrictModes yes/g" {{item}} &&
+         sed -i -e "s/#MaxAuthTries 6/MaxAuthTries 6/g" {{item}} &&
+         sed -i -e "s/#UsePAM no/UsePAM yes/g" {{item}} &&
+         sed -i -e "s/#X11Forwarding no/X11Forwarding no/g" {{item}} &&
+         sed -i -e "s/Subsystem       sftp    \/usr\/libexec\/sftp-server/#Subsystem       sftp    \/usr\/libexec\/sftp-server/g" {{item}} &&
+         sed -i -e "s/#UseDNS yes/UseDNS no/g" {{item}} &&
+         sed -i -e "s/UsePrivilegeSeparation sandbox/UsePrivilegeSeparation no/g" {{item}}
+  with_items:
+    - /etc/ssh/sshd_config
+
+- name: Install /etc/pam.d/sshd
+  copy: src=etc/pam.d/sshd dest=/etc/pam.d/sshd owner=root group=root mode=644
+
+- name: Install /etc/pam.d/login
+  copy: src=etc/pam.d/login dest=/etc/pam.d/login owner=root group=root mode=644
+
+- name: Install /etc/security/limits.d/90-nproc.conf
+  copy: src=etc/security/limits.d/90-nproc.conf dest=/etc/security/limits.d/90-nproc.conf owner=root group=root mode=644
+
+- name: Install /etc/security/limits.d/91-nofile.conf
+  copy: src=etc/security/limits.d/91-nofile.conf dest=/etc/security/limits.d/91-nofile.conf owner=root group=root mode=644
+
+- name: Restart service sshd
+  service: name=sshd state=restarted

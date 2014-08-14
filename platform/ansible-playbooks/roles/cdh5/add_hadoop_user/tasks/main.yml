@@ -17,3 +17,6 @@
   - id_rsa
   - id_rsa.pub
   - authorized_keys
+
+- name: Create tmp directory
+  file: path=/home/hadoop/tmp state=directory owner=hadoop group=hadoop mode=0755

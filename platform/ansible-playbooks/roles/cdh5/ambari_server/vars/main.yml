@@ -1,0 +1,3 @@
+AMBARI_VERSION: 1.6.1
+AMBARI_REPO_FILE_NAME: ambari.repo
+AMBARI_REPO_FILE_URL: 'http://public-repo-1.hortonworks.com/ambari/centos6/1.x/updates/{{AMBARI_VERSION}}/{{AMBARI_REPO_FILE_NAME}}'

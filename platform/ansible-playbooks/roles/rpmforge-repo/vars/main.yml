@@ -1,0 +1,3 @@
+---
+RPMFORGE_REPO_RPM_FILE_NAME: rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
+RPMFORGE_REPO_RPM_FILE_URL: http://pkgs.repoforge.org/rpmforge-release/{{RPMFORGE_REPO_RPM_FILE_NAME}}

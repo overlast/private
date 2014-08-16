@@ -20,3 +20,11 @@
 
 - name: Create tmp directory
   file: path=/home/hadoop/tmp state=directory owner=hadoop group=hadoop mode=0755
+
+- name: Add hadoop user as sudoer
+  shell: chmod 755 {{item}} &&
+         perl -0777 -pe "s|## Same thing without a password\n# %wheel|## Same thing without a password\nhadoop ALL=(ALL) NOPASSWD{{colon}} ALL\n# %wheel|m" {{item}} > {{item}}.ansible &&
+         mv {{item}}.ansible {{item}} &&
+         chmod 440 {{item}}
+  with_items:
+    - /etc/sudoers

@@ -458,7 +458,7 @@ use-java () {
 }
 use-java
 
-# To keep SSH_AUTH_SOCK 
+# To keep SSH_AUTH_SOCK
 function ssh-reagent () {
     # Find a usable agent
     ls /tmp/|grep ssh-
@@ -472,7 +472,7 @@ function ssh-reagent () {
 	    echo "Cannot find ssh agent – maybe you should reconnect and forward it?"
 	    export SSH_AUTH_SOCK=""
 	fi
-    else 
+    else
 	echo "Cannot find ssh agent – maybe you should reconnect and forward it"
 	export SSH_AUTH_SOCK=""
     fi
@@ -482,16 +482,16 @@ function exec-ssh-agent () {
     eval `ssh-agent` > ~/.ssh-agent.tmp
     MY_SSH_AGENT_PID=`cat ~/.ssh-agent.tmp|cut -d" " -f3`
     rm -f ~/.ssh-agent.tmp
-    if [ -s ~/.ssh/id_rsa ]; then 
+    if [ -s ~/.ssh/id_rsa ]; then
 	ssh-add ~/.ssh/id_rsa
     fi
-    if [ -s ~/.ssh/id_rsa.team-1 ]; then 
+    if [ -s ~/.ssh/id_rsa.team-1 ]; then
 	ssh-add ~/.ssh/id_rsa.team-1
     fi
 }
 
 function remove-file () {
-    FILE_PATH=$1 
+    FILE_PATH=$1
     if [ -s $FILE_PATH ]; then
 	rm $FILE_PATH
     fi
@@ -525,3 +525,14 @@ elif [ ! -L "$SSH_AUTH_SOCK" ]; then
 fi
 
 
+if [ -d /opt/rh/] ; then
+    if [ -d /opt/rh/devtoolset-2] ; then
+        if [ -d /opt/rh/devtoolset-2/enable] ; then
+            cat /opt/rh/devtoolset-2/enable| grep -v "export PERL5LIB"| grep -v "export PYTHONPATH"| grep -v "pythonvers" > /tmp/my-enable; source /tmp/my-enable
+        fi
+    elif [ -d /opt/rh/devtoolset-1.1] ; then
+        if [ -d /opt/rh/devtoolset-1.1/enable] ; then
+            cat /opt/rh/devtoolset-1.1/enable| grep -v "export PERL5LIB"| grep -v "export PYTHONPATH"| grep -v "pythonvers" > /tmp/my-enable; source /tmp/my-enable
+        fi
+    fi
+fi

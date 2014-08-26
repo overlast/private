@@ -525,13 +525,13 @@ elif [ ! -L "$SSH_AUTH_SOCK" ]; then
 fi
 
 
-if [ -d /opt/rh/] ; then
-    if [ -d /opt/rh/devtoolset-2] ; then
-        if [ -d /opt/rh/devtoolset-2/enable] ; then
+if [ -d /opt/rh/ ] ; then
+    if [ -d /opt/rh/devtoolset-2 ] ; then
+        if [ -d /opt/rh/devtoolset-2/enable ] ; then
             cat /opt/rh/devtoolset-2/enable| grep -v "export PERL5LIB"| grep -v "export PYTHONPATH"| grep -v "pythonvers" > /tmp/my-enable; source /tmp/my-enable
         fi
-    elif [ -d /opt/rh/devtoolset-1.1] ; then
-        if [ -d /opt/rh/devtoolset-1.1/enable] ; then
+    elif [ -d /opt/rh/devtoolset-1.1 ] ; then
+        if [ -d /opt/rh/devtoolset-1.1/enable ] ; then
             cat /opt/rh/devtoolset-1.1/enable| grep -v "export PERL5LIB"| grep -v "export PYTHONPATH"| grep -v "pythonvers" > /tmp/my-enable; source /tmp/my-enable
         fi
     fi

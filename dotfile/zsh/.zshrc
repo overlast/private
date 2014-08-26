@@ -536,3 +536,22 @@ if [ -d /opt/rh/ ] ; then
         fi
     fi
 fi
+
+
+if [ -d /usr/local/xbuild/ ]; then
+    if [ -d /usr/local/xbuild/python ]; then
+        if [ -d /usr/local/xbuild/python/bin ]; then
+            export PATH=/usr/local/xbuild/python/bin:$PATH
+        fi
+    fi
+    if [ -d /usr/local/xbuild/ruby ]; then
+        if [ -d /usr/local/xbuild/ruby/bin ]; then
+            export PATH=/usr/local/xbuild/ruby/bin:$PATH
+        fi
+    fi
+    if [ -d /usr/local/xbuild/perl ]; then
+        if [ -d /usr/local/xbuild/perl/bin ]; then
+            export PATH=/usr/local/xbuild/perl/bin:$PATH
+        fi
+    fi
+fi

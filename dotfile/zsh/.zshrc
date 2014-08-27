@@ -528,11 +528,11 @@ fi
 if [ -d /opt/rh/ ] ; then
     if [ -d /opt/rh/devtoolset-2 ] ; then
         if [ -s /opt/rh/devtoolset-2/enable ] ; then
-            cat /opt/rh/devtoolset-2/enable| grep -v "export PERL5LIB" > /tmp/my-enable; source /tmp/my-enable
+            cat /opt/rh/devtoolset-2/enable| grep -v "export PERL5LIB"| grep -v "export PYTHONPATH"| grep -v "pythonvers" > /tmp/my-enable; source /tmp/my-enable
         fi
     elif [ -d /opt/rh/devtoolset-1.1 ] ; then
         if [ -s /opt/rh/devtoolset-1.1/enable ] ; then
-            cat /opt/rh/devtoolset-1.1/enable| grep -v "export PERL5LIB"  > /tmp/my-enable; source /tmp/my-enable
+            cat /opt/rh/devtoolset-1.1/enable| grep -v "export PERL5LIB"| grep -v "export PYTHONPATH"| grep -v "pythonvers" > /tmp/my-enable; source /tmp/my-enable
         fi
     fi
 fi
@@ -541,17 +541,17 @@ fi
 if [ -d /usr/local/xbuild/ ]; then
     if [ -d /usr/local/xbuild/python ]; then
         if [ -d /usr/local/xbuild/python/bin ]; then
-            export PATH=/usr/local/xbuild/python/bin:$PATH
+            export PATH=$PATH:/usr/local/xbuild/python/bin
         fi
     fi
     if [ -d /usr/local/xbuild/ruby ]; then
         if [ -d /usr/local/xbuild/ruby/bin ]; then
-            export PATH=/usr/local/xbuild/ruby/bin:$PATH
+            export PATH=$PATH:/usr/local/xbuild/ruby/bin
         fi
     fi
     if [ -d /usr/local/xbuild/perl ]; then
         if [ -d /usr/local/xbuild/perl/bin ]; then
-            export PATH=/usr/local/xbuild/perl/bin:$PATH
+            export PATH=$PATH:/usr/local/xbuild/perl/bin
         fi
     fi
 fi

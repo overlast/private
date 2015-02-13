@@ -37,6 +37,7 @@
   '(
     ;; ここに使っているパッケージを書く。
     color-moccur
+    python-mode
     flymake-easy
     recentf-ext
     anything
@@ -829,10 +830,9 @@
             ;; Set tab width and replace indent tabs to spaces
             (setq-default tab-width 2 indent-tabs-mode nil)))
 
-(autoload 'python "python" nil t)
+(autoload 'python-mode "python-mode" nil t)
 (add-to-list 'auto-mode-alist '("\\.\\([pP][yY]\\|wscript\\)$" . python))
-(defalias 'python-mode 'python)
-(eval-after-load "python"
+(eval-after-load "python-mode"
   '(progn
      ;; https://github.com/purcell/flymake-python-pyflakes
      (defun flymake-python-load ()
@@ -847,7 +847,7 @@
 
                                    (setq flymake-python-pyflakes-executable "flake8")
                                    ;; ignore the character counting process for a comment line
-                                   (setq flymake-python-pyflakes-extra-arguments '("--ignore=E501"))
+                                   (setq flymake-python-pyflakes-extra-arguments (quote ("--max-line-length=120" "--ignore=E124" "--ignore=E126" "--ignore=E128")))
                                    (interactive)
 
                                    (el-get 'sync '(ac-python))

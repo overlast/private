@@ -43,7 +43,7 @@
     helm
     popwin
     browse-kill-ring
-    el-get 
+    el-get
     auto-complete
     color-theme
     wdired
@@ -830,6 +830,7 @@
             (setq-default tab-width 2 indent-tabs-mode nil)))
 
 (autoload 'python "python" nil t)
+(add-to-list 'auto-mode-alist '("\\.\\([pP][yY]\\|wscript\\)$" . python))
 (defalias 'python-mode 'python)
 (eval-after-load "python"
   '(progn

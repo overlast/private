@@ -1,0 +1,66 @@
+---
+- name: Download CDH 5 repository file {{CDH5_REPO_RPM_URL}}
+  get_url: url={{CDH5_REPO_RPM_URL}} dest=/home/hadoop/tmp/{{CDH5_REPO_RPM_NAME}}
+
+- name: Install CDH5 RPM from local file
+  yum: name=/home/hadoop/tmp/{{CDH5_REPO_RPM_NAME}} state=present
+
+- name: Import Cloudera Public GPG Key
+  rpm_key: state=present key={{CDH5_REPO_KEY_URL}}
+
+- name: Download Ambari repository file {{AMBARI_REPO_FILE_URL}}
+  get_url: url={{AMBARI_REPO_FILE_URL}} dest=/home/hadoop/tmp/{{AMBARI_REPO_FILE_NAME}}
+
+- name: Copy Ambari repository file to /etc/yum.repos.d/
+  copy: src=/home/hadoop/tmp/{{item}} dest=/etc/yum.repos.d/{{item}} owner=root group=root mode=644
+  with_items:
+   - '{{AMBARI_REPO_FILE_NAME}}'
+
+- name: Delete yum package cache
+  shell: yum clean all
+
+- name: Set 65536 as hard limit of process size to /etc/security/limits.conf
+  copy: src=etc/security/{{item}} dest=/etc/security/{{item}} owner=root group=root mode=644
+  with_items:
+   - limits.conf
+
+- name: Comment out default nproc limit of /etc/security/limits.d/90-nproc.conf
+  copy: src=etc/security/limits.d/{{item}} dest=/etc/security/limits.d/{{item}} owner=root group=root mode=644
+  with_items:
+   - 90-nproc.conf
+
+- name: Create /etc/initscript to set default value of daemon
+  copy: src=etc/{{item}} dest=/etc/{{item}} owner=root group=root mode=644
+  with_items:
+   - initscript
+
+- name: Create the /etc/hosts file of all servers
+  template: src=hosts.j2 dest=/etc/hosts owner=root group=root mode=0644
+
+- name: Install must install rpms to use hadoop
+  yum: name={{item}} state=present
+  with_items:
+  - gcc
+  - gcc-c++
+  - make
+
+#- name: Install Hadoop base packages
+#  yum: name={{item}}-{{RPM_VERSION['hadoop']}} state=present
+#  with_items:
+#  - hadoop
+#  - hadoop-mapreduce
+#B  - hadoop-yarn
+#  - hadoop-hdfs
+
+
+
+# hbase
+#spark-core spark-master spark-worker spark-history-server spark-python
+# hive hive-metastore hive-server2 hive-hbase
+# hue hue-plugins
+# sqoop2-server sqoop2-client
+#  oozie oozie-client
+# mahout mahout-doc
+# llama-master
+#  impala impala-server impala-state-store   impala-catalog impala-shell
+# zookeeper-server

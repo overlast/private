@@ -1,0 +1,20 @@
+---
+CDH5_REPO_RPM_NAME: cloudera-cdh-5-0.x86_64.rpm
+CDH5_REPO_RPM_URL: 'http://archive.cloudera.com/cdh5/one-click-install/redhat/6/x86_64/{{CDH5_REPO_RPM_NAME}}'
+CDH5_REPO_KEY_URL: 'http://archive.cloudera.com/cdh5/redhat/6/x86_64/cdh/RPM-GPG-KEY-cloudera'
+CHD5_RPM_VERSION:
+  - hadoop: '2.3.0+cdh5.1.0+795-1.cdh5.1.0.p0.58.el'
+  - hbase: '0.98.1+cdh5.1.0+64-1.cdh5.1.0.p0.34.el6'
+  - hive: '0.12.0+cdh5.1.0+369-1.cdh5.1.0.p0.39.el6'
+  - pig: '0.12.0+cdh5.1.0+33-1.cdh5.1.0.p0.23.el6'
+  - zookeeper: '3.4.5+cdh5.1.0+29-1.cdh5.1.0.p0.31.el6'
+  - spark: '1.0.0+cdh5.1.0+41-1.cdh5.1.0.p0.27.el6'
+  - hue: '3.6.0+cdh5.1.0+86-1.cdh5.1.0.p0.36.el6'
+  - sqoop2: '1.99.3+cdh5.1.0+26-1.cdh5.1.0.p0.22.el6'
+  - oozie: '4.0.0+cdh5.1.0+249-1.cdh5.1.0.p0.28.el6'
+  - mahout: '0.9+cdh5.1.0+11-1.cdh5.1.0.p0.23.el6'
+  - llama: '1.0.0+cdh5.1.0+0-1.cdh5.1.0.p0.25.el6'
+  - impala: '1.4.0+cdh5.1.0+0-1.cdh5.1.0.p0.92.el6'
+AMBARI_VERSION: 1.6.1
+AMBARI_REPO_FILE_NAME: ambari.repo
+AMBARI_REPO_FILE_URL: 'http://public-repo-1.hortonworks.com/ambari/centos6/1.x/updates/{{AMBARI_VERSION}}/{{AMBARI_REPO_FILE_NAME}}'

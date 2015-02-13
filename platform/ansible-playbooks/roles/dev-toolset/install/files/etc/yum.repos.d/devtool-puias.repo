@@ -1,0 +1,5 @@
+[devtools-puias]
+name=Developer Toolset Repository for RHEL $releasever by puias
+baseurl=http://puias.princeton.edu/data/puias/DevToolset/$releasever/$basearch
+gpgcheck=0
+enabled=0

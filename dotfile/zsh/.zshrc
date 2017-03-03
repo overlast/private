@@ -458,7 +458,17 @@ use-java () {
 }
 use-java
 
-# keep SSH_AUTH_SOCK 
+use-gdate () {
+    MYOS="$(uname)" # get os name
+    case $MYOS in
+        Linux) date ;;
+        Darwin) alias date="gdate"; date ;;
+        *) ;;
+    esac
+}
+use-gdate
+
+# keep SSH_AUTH_SOCK
 
 # Find a usable agent
 function ssh-reagent () {
@@ -473,7 +483,7 @@ function ssh-reagent () {
 	    echo "Cannot find ssh agent – maybe you should reconnect and forward it?"
 	    export SSH_AUTH_SOCK=""
 	fi
-    else 
+    else
 	echo "Cannot find ssh agent – maybe you should reconnect and forward it"
 	export SSH_AUTH_SOCK=""
     fi
@@ -483,10 +493,10 @@ function exec-ssh-agent () {
   eval `ssh-agent` > ~/.ssh-agent.tmp
   MY_SSH_AGENT_PID=`cat ~/.ssh-agent.tmp|cut -d" " -f3`
   rm -f ~/.ssh-agent.tmp
-  if [ -s ~/.ssh/id_rsa ]; then 
+  if [ -s ~/.ssh/id_rsa ]; then
       ssh-add ~/.ssh/id_rsa
   fi
-  if [ -s ~/.ssh/id_rsa.team-1 ]; then 
+  if [ -s ~/.ssh/id_rsa.team-1 ]; then
       ssh-add ~/.ssh/id_rsa.team-1
   fi
 }
@@ -541,5 +551,3 @@ elif [ ! -S "$SSH_AUTH_SOCK" ]; then
 elif [ ! -L "$SSH_AUTH_SOCK" ]; then
     ln -snf "$SSH_AUTH_SOCK" $agent && export SSH_AUTH_SOCK=$agent
 fi
-
-

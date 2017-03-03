@@ -37,12 +37,14 @@
   '(
     ;; ここに使っているパッケージを書く。
     color-moccur
+    python-mode
     flymake-easy
     recentf-ext
     anything
     helm
     popwin
     browse-kill-ring
+    el-get
     auto-complete
     color-theme
     wdired
@@ -62,6 +64,7 @@
     wgrep
     wgrep-ag
     markdown-mode
+    yasnippet
     ))
 (let ((not-installed (loop for x in installing-package-list
                             when (not (package-installed-p x))
@@ -539,6 +542,19 @@
 (global-auto-highlight-symbol-mode t)
 
 ;======================================================================
+; yasnippet
+; http://shibayu36.hatenablog.com/entry/2012/12/18/224535
+;======================================================================
+
+(require 'yasnippet)
+
+(setq yas-snippet-dirs '("~/.emacs.d/snippets"))
+(custom-set-variables '(yas-trigger-key "TAB"))
+
+ (yas-reload-all)
+;(yas-global-mode 1)
+
+;======================================================================
 ; FlyMake
 ; http://www.emacswiki.org/emacs-zh/FlyMake
 ; http://d.hatena.ne.jp/sugyan/20120103/1325601340
@@ -804,6 +820,7 @@
 
                                   (perl-completion-mode t)
                                   (flymake-perl-load)
+                                  (yas-minor-mode)
                                   ))
      ))
 
@@ -813,9 +830,9 @@
             ;; Set tab width and replace indent tabs to spaces
             (setq-default tab-width 2 indent-tabs-mode nil)))
 
-(autoload 'python "python" nil t)
-(defalias 'python-mode 'python)
-(eval-after-load "python"
+(autoload 'python-mode "python-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.\\([pP][yY]\\|wscript\\)$" . python))
+(eval-after-load "python-mode"
   '(progn
      ;; https://github.com/purcell/flymake-python-pyflakes
      (defun flymake-python-load ()
@@ -830,7 +847,7 @@
 
                                    (setq flymake-python-pyflakes-executable "flake8")
                                    ;; ignore the character counting process for a comment line
-                                   (setq flymake-python-pyflakes-extra-arguments '("--ignore=E501"))
+                                   (setq flymake-python-pyflakes-extra-arguments (quote ("--max-line-length=120" "--ignore=E124" "--ignore=E126" "--ignore=E128")))
                                    (interactive)
 
                                    (el-get 'sync '(ac-python))

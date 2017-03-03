@@ -471,7 +471,9 @@ use-gdate
 # keep SSH_AUTH_SOCK
 
 # Find a usable agent
+# To keep SSH_AUTH_SOCK
 function ssh-reagent () {
+    # Find a usable agent
     ls /tmp/|grep ssh-
     if [ $? -eq 0  ]; then
 	export SSH_AUTH_SOCK=$(find /tmp/ssh-* -name agent\* -printf ‘'%T@ %p\n' | sort -k 1nr | sed 's/^[^ ]* //' | head -n 1)
@@ -501,46 +503,29 @@ function exec-ssh-agent () {
   fi
 }
 
+function remove-file () {
+    FILE_PATH=$1
+    if [ -s $FILE_PATH ]; then
+	rm $FILE_PATH
+    fi
+}
+
 agent="$HOME/tmp/.ssh-agent-`hostname`"
 ENV_SSH_AUTH_SOCK=`env|grep "SSH_AUTH_SOCK"`
 
-if [ "$ENV_SSH_AUTH_SOCK" != "" ];then
-    if [ "$SSH_AUTH_SOCK" != "" ];then
-	if [ ! -S "$SSH_AUTH_SOCK" ]; then
-	    export SSH_AUTH_SOCK=""
-	    if [ -s $agent ]; then
-		rm $agent
-	    fi
-	fi
-    fi
+if [ "$ENV_SSH_AUTH_SOCK" != "" ] && [ "$SSH_AUTH_SOCK" != "" ] && [ ! -S "$SSH_AUTH_SOCK" ]; then
+    export SSH_AUTH_SOCK=""
+    remove-file $agent
 fi
 
-if [ "$SSH_AUTH_SOCK" != "" ];then
-    if [ "$SSH_AUTH_SOCK" = "SSH_AUTH_SOCK=" ];then
-	ssh-reagent
-	if [ -s $agent ]; then
-	    rm $agent
-	fi
-    fi
-else
+if [ "$SSH_AUTH_SOCK" = "" ] || [ "$SSH_AUTH_SOCK" = "SSH_AUTH_SOCK=" ];then
     ssh-reagent
-    if [ -s $agent ]; then
-	rm $agent
-    fi
+    remove-file $agent
 fi
 
-if [ "$SSH_AUTH_SOCK" != "" ];then
-    if [ "$SSH_AUTH_SOCK" = "SSH_AUTH_SOCK=" ];then
-	exec-ssh-agent
-	if [ -s $agent ]; then
-	    rm $agent
-	fi
-    fi
-else
+if [ "$SSH_AUTH_SOCK" = "" ] || [ "$SSH_AUTH_SOCK" = "SSH_AUTH_SOCK=" ];then
     exec-ssh-agent
-    if [ -s $agent ]; then
-	rm $agent
-    fi
+    remove-file $agent
 fi
 
 if [ -S "$agent" ]; then
@@ -550,4 +535,36 @@ elif [ ! -S "$SSH_AUTH_SOCK" ]; then
     echo "no ssh-agent"
 elif [ ! -L "$SSH_AUTH_SOCK" ]; then
     ln -snf "$SSH_AUTH_SOCK" $agent && export SSH_AUTH_SOCK=$agent
+fi
+
+
+if [ -d /opt/rh/ ] ; then
+    if [ -d /opt/rh/devtoolset-2 ] ; then
+        if [ -s /opt/rh/devtoolset-2/enable ] ; then
+            cat /opt/rh/devtoolset-2/enable| grep -v "export PERL5LIB"| grep -v "export PYTHONPATH"| grep -v "pythonvers" > /tmp/my-enable; source /tmp/my-enable
+        fi
+    elif [ -d /opt/rh/devtoolset-1.1 ] ; then
+        if [ -s /opt/rh/devtoolset-1.1/enable ] ; then
+            cat /opt/rh/devtoolset-1.1/enable| grep -v "export PERL5LIB"| grep -v "export PYTHONPATH"| grep -v "pythonvers" > /tmp/my-enable; source /tmp/my-enable
+        fi
+    fi
+fi
+
+
+if [ -d /usr/local/xbuild/ ]; then
+    if [ -d /usr/local/xbuild/python ]; then
+        if [ -d /usr/local/xbuild/python/bin ]; then
+            export PATH=$PATH:/usr/local/xbuild/python/bin
+        fi
+    fi
+    if [ -d /usr/local/xbuild/ruby ]; then
+        if [ -d /usr/local/xbuild/ruby/bin ]; then
+            export PATH=$PATH:/usr/local/xbuild/ruby/bin
+        fi
+    fi
+    if [ -d /usr/local/xbuild/perl ]; then
+        if [ -d /usr/local/xbuild/perl/bin ]; then
+            export PATH=$PATH:/usr/local/xbuild/perl/bin
+        fi
+    fi
 fi

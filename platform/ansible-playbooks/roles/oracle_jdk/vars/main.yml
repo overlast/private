@@ -1,0 +1,6 @@
+JDK_VERSION: 8u11
+JDK_BUG_FIX: b12
+JDK_DIRECTORY: '{{JDK_VERSION}}-{{JDK_BUG_FIX}}'
+JDK_RPM_NAME: 'jdk-{{JDK_VERSION}}-linux-x64.rpm'
+JAVA_DOWNLOAD_URL: http://download.oracle.com/otn-pub/java/jdk/{{JDK_DIRECTORY}}/{{JDK_RPM_NAME}}
+JAVA_DOWNLOAD_PATH: /usr/local/src/{{JDK_RPM_NAME}}

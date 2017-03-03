@@ -1,0 +1,6 @@
+---
+- name: install xbuild
+  git: >
+    repo=git://github.com/tagomoris/xbuild.git
+    dest=/usr/local/xbuild
+    update=yes

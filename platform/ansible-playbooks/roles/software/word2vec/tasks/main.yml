@@ -1,0 +1,50 @@
+---
+- name: Checkout word2vec
+  subversion: repo=http://word2vec.googlecode.com/svn/trunk/ dest=/tmp/word2vec
+
+- name: Compile and install word2vec
+  shell: source /opt/rh/devtoolset-2/enable && cd /tmp/word2vec && make
+
+- name: Create install directory for word2vec
+  file: path={{item}} owner=root group=root mode=0755 state=directory
+  with_items:
+    - /usr/local/word2vec/
+    - /usr/local/word2vec/bin/
+
+- name: Copy binary files of word2vec
+  shell: cp /tmp/word2vec/{{item}} /usr/local/word2vec/bin/{{item}}
+  with_items:
+    - compute-accuracy
+    - demo-analogy.sh
+    - demo-classes.sh
+    - demo-phrase-accuracy.sh
+    - demo-phrases.sh
+    - demo-word-accuracy.sh
+    - demo-word.sh
+    - distance
+    - word-analogy
+    - word2phrase
+    - word2vec
+
+- name: chmod 755 for binary files of word2vec
+  file: path=/usr/local/word2vec/bin/{{item}} owner=root group=root mode=755 state=file
+  with_items:
+    - compute-accuracy
+    - demo-analogy.sh
+    - demo-classes.sh
+    - demo-phrase-accuracy.sh
+    - demo-phrases.sh
+    - demo-word-accuracy.sh
+    - demo-word.sh
+    - distance
+    - word-analogy
+    - word2phrase
+    - word2vec
+
+- name: Install jansson
+  yum: name={{item}} state=present
+  with_items:
+    - jansson
+    - jansson-devel
+
+# install xbuild

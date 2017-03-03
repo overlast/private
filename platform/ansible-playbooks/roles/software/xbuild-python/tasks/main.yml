@@ -1,0 +1,105 @@
+---
+- name: install dependent packages to build python
+  yum: name={{ item }} state=present
+  with_items:
+    - expat-devel
+    - libGL-devel
+    - tcl-devel
+    - tk-devel
+    - libX11-devel
+    - glibc-devel
+    - tix-devel
+    - bzip2-devel
+    - sqlite-devel
+    - db4-devel
+    - libffi-devel
+    - valgrind-devel
+    - systemtap-sdt-devel
+    - libpng
+    - libpng-devel
+    - freetype-devel
+    - freetype
+    - libjpeg
+    - libjpeg-devel
+
+- name: install python
+  command: >
+    /usr/local/xbuild/python-install 3.4.1
+    /usr/local/xbuild/python-3.4.1
+    creates=/usr/local/xbuild/python-3.4.1
+
+- name: Ceate symlink to /usr/local/xbuild/python-3.4.1
+  file: src=/usr/local/xbuild/python-3.4.1 dest=/usr/local/xbuild/python state=link
+
+- name: Install yum modules
+  yum: name={{item}} state=latest
+  with_items:
+    - gcc-gfortran
+    - libgfortran
+    - blas
+    - blas-devel
+    - lapack
+    - lapack-devel
+    - zeromq
+    - zeromq-devel
+
+- name:
+  shell: /usr/local/xbuild/python/bin/pip install {{item}}
+  with_items:
+    - numpy
+    - scikit-learn
+    - scipy
+    - pyyaml
+
+- name:
+  command: wget http://www.nltk.org/nltk3-alpha/nltk-3.0a3.tar.gz chdir=/tmp/
+
+- name:
+  command: tar xfvz nltk-3.0a3.tar.gz chdir=/tmp/
+
+- name:
+  command: /usr/local/xbuild/python/bin/python setup.py install chdir=/tmp/nltk-3.0a3
+
+- name:
+  shell: /usr/local/xbuild/python/bin/pip install {{item}}
+  with_items:
+    - pandas
+    - cython
+    - patsy
+
+- git: repo=git://github.com/statsmodels/statsmodels.git
+       dest=/tmp/statsmodels
+        update=yes
+
+- name:
+  command: /usr/local/xbuild/python/bin/pip install . chdir=/tmp/statsmodels
+
+- name:
+  command: wget "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.3/freetype-2.5.3.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Ffreetype%2Ffiles%2Ffreetype2%2F2.5.3%2Ffreetype-2.5.3.tar.gz%2Fdownload&ts=1409118618&use_mirror=jaist" -O freetype-2.5.3.tar.gz chdir=/tmp/
+
+- name:
+  command: tar xfvz freetype-2.5.3.tar.gz  chdir=/tmp/
+
+- name:
+  shell: cd /tmp/freetype-2.5.3 && {{item}}
+  with_items:
+    - make clean
+    - ./configure
+    - make
+    - make install
+    - ldconfig
+
+- name:
+  shell: /usr/local/xbuild/python/bin/pip install {{item}}
+  with_items:
+    - ggplot
+    - openpyxl==1.8.6
+    - brewer2mpl
+    - ipython
+    - pyquery
+    - pyzmq
+    - jinja2
+    - requests
+    - pillow
+    - crypto
+    - passlib

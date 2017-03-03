@@ -1,0 +1,12 @@
+---
+- name: Install RPM package
+  shell: rpm {{item}}
+  with_items:
+    - -ivh http://ftp-srv2.kddilabs.jp/Linux/distributions/fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm
+    - --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6
+  ignore_errors: True
+
+- name: Install ansible
+  yum: name={{item}} state=present
+  with_items:
+    - ansible

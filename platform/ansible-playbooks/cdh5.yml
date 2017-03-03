@@ -1,0 +1,17 @@
+- hosts: all_servers
+  user: overlast
+  sudo: True
+  roles:
+    - cdh5/add_hadoop_user
+
+- hosts: ambari_server
+  user: overlast
+  sudo: True
+  roles:
+    - cdh5/ambari_server
+
+- hosts: all_servers
+  user: overlast
+  sudo: True
+  roles:
+    - cdh5/ambari_agents

@@ -1,0 +1,6 @@
+- hosts: all_servers
+  user: overlast
+  sudo: True
+  roles:
+    - software/xbuild
+    - software/xbuild-python

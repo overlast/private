@@ -1,0 +1,13 @@
+---
+- name: Install .repo file of http://puias.princeton.edu/data/puias/DevToolset/
+  copy: src=etc/yum.repos.d/{{item}} dest=/etc/yum.repos.d/{{item}}  owner=root group=root mode=644
+  with_items:
+    - devtool-puias.repo
+
+- name: Install devtoolset-2-gcc etc
+  shell: yum -y --enablerepo=devtools-puias install {{item}}
+  with_items:
+    - devtoolset-2-gcc
+    - devtoolset-2-binutils
+    - devtoolset-2-gcc-c++
+    - devtoolset-2-gcc-gfortran

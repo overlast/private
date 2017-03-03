@@ -1,0 +1,5 @@
+- hosts: all_servers
+  user: overlast
+  sudo: True
+  roles:
+    - ansible

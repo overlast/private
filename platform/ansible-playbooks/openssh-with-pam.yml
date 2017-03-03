@@ -1,0 +1,5 @@
+- hosts: all
+  user: overlast
+  sudo: True
+  roles:
+    - openssh-with-pam

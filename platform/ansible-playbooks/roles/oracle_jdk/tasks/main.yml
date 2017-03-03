@@ -1,0 +1,18 @@
+---
+- name: Delete {{JAVA_DOWNLOAD_PATH}}
+  command: 'rm -rf {{JAVA_DOWNLOAD_PATH}}'
+
+- name: Download package of Oracle JDK {{JDK_VERSION}}
+  command: 'wget -nc -q -O {{JAVA_DOWNLOAD_PATH}} --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" {{JAVA_DOWNLOAD_URL}} creates={{JAVA_DOWNLOAD_PATH}}'
+  poll: 30
+  async: 6000
+
+- name: Install Oracle JDK {{JDK_VERSION}}
+  yum: name={{JAVA_DOWNLOAD_PATH}}
+
+- name: Update alternatives to use {{JDK_DIRECTORY}}
+  action: |
+    shell
+    /usr/sbin/alternatives --install /usr/bin/java java /usr/java/latest/bin/java 18011 &&
+    /usr/sbin/alternatives --install /usr/bin/javac javac /usr/java/latest/bin/javac 18011 &&
+    /usr/sbin/alternatives --install /usr/bin/jar jar /usr/java/latest/bin/jar 18011

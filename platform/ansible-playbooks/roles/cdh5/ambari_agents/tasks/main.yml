@@ -1,0 +1,30 @@
+---
+- name: Download Ambari repository file {{AMBARI_REPO_FILE_URL}}
+  get_url: url={{AMBARI_REPO_FILE_URL}} dest=/home/hadoop/tmp/{{AMBARI_REPO_FILE_NAME}}
+
+- name: Copy Ambari repository file to /etc/yum.repos.d/
+  copy: src=/home/hadoop/tmp/{{item}} dest=/etc/yum.repos.d/{{item}} owner=root group=root mode=644
+  with_items:
+   - '{{AMBARI_REPO_FILE_NAME}}'
+
+- name: Delete yum package cache
+  shell: yum clean all
+
+- name: Copy rrdtool-1.4.5-1.el6.x86_64.rpm from local
+  copy: src=repos/centos6/rrdtool/{{item}} dest=/home/hadoop/tmp/{{item}} owner=hadoop group=hadoop mode=644
+  with_items:
+    - rrdtool-1.4.5-1.el6.x86_64.rpm
+
+- name: Install rrdtool-1.4.5-1.el6.x86_64.rpm from /home/hadoop/tmp/
+  yum: name=/home/hadoop/tmp/rrdtool-1.4.5-1.el6.x86_64.rpm state=present
+
+- name: Stop ambari-server, if it's running
+  service: name=ambari-agent state=stopped
+  register: result
+  ignore_errors: True
+
+- name : install ambari-agent
+  yum : name=ambari-agent state=present
+
+- name: Start ambari-agent, if it's running
+  service: name=ambari-agent state=started

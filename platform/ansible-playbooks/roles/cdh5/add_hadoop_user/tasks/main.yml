@@ -1,0 +1,30 @@
+---
+- name: Create hadoop group
+  group: name=hadoop state=present gid={{GID}}
+
+- name: Create hadoop user
+  user: name=hadoop group=hadoop shell={{SHELL}} password={{PASSWORD}} uid={{UID}} state=present
+
+- name: chmod 755 /home/hadoop
+  file: path=/home/hadoop/ state=directory owner=hadoop group=hadoop mode=0755
+
+- name: Create .ssh directory of hadoop user
+  file: path=/home/hadoop/.ssh state=directory owner=hadoop group=hadoop mode=0700
+
+- name: Copy SSH-keys of hadoop user
+  copy: src=hadoop/sshkeys/{{item}} dest=/home/hadoop/.ssh/{{item}} owner=hadoop group=hadoop mode=600
+  with_items:
+  - id_rsa
+  - id_rsa.pub
+  - authorized_keys
+
+- name: Create tmp directory
+  file: path=/home/hadoop/tmp state=directory owner=hadoop group=hadoop mode=0755
+
+- name: Add hadoop user as sudoer
+  shell: chmod 755 {{item}} &&
+         perl -0777 -pe "s|## Same thing without a password\n# %wheel|## Same thing without a password\nhadoop ALL=(ALL) NOPASSWD{{colon}} ALL\n# %wheel|m" {{item}} > {{item}}.ansible &&
+         mv {{item}}.ansible {{item}} &&
+         chmod 440 {{item}}
+  with_items:
+    - /etc/sudoers

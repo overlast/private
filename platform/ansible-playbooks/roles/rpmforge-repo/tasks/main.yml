@@ -1,0 +1,11 @@
+---
+- name: Download Rpmforge repository file {{RPMFORGE_REPO_RPM_FILE_URL}}
+  get_url: url={{RPMFORGE_REPO_RPM_FILE_URL}} dest=/home/hadoop/tmp/{{RPMFORGE_REPO_RPM_FILE_NAME}}
+
+- name: Copy Rpmforge repository file to /etc/yum.repos.d/
+  yum: name=/home/hadoop/tmp/{{item}} state=present
+  with_items:
+   - '{{RPMFORGE_REPO_RPM_FILE_NAME}}'
+
+- name: Delete yum package cache
+  shell: yum clean all

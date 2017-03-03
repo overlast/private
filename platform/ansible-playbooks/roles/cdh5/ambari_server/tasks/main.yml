@@ -1,0 +1,22 @@
+---
+- name: Download Ambari repository file {{AMBARI_REPO_FILE_URL}}
+  get_url: url={{AMBARI_REPO_FILE_URL}} dest=/home/hadoop/tmp/{{AMBARI_REPO_FILE_NAME}}
+
+- name: Copy Ambari repository file to /etc/yum.repos.d/
+  copy: src=/home/hadoop/tmp/{{item}} dest=/etc/yum.repos.d/{{item}} owner=root group=root mode=644
+  with_items:
+   - '{{AMBARI_REPO_FILE_NAME}}'
+
+- name: Delete yum package cache
+  shell: yum clean all
+
+- name: Stop ambari-server, if it's running
+  service: name=ambari-server state=stopped
+  register: result
+  ignore_errors: True
+
+- name : install ambari-server
+  yum : name=ambari-server state=present
+
+- name: Start ambari-server, if it's running
+  service: name=ambari-server state=started

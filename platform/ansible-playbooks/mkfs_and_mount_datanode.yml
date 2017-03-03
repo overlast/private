@@ -1,0 +1,5 @@
+- hosts: node_servers
+  user: overlast
+  sudo: True
+  roles:
+    - mkfs_and_mount_datanode

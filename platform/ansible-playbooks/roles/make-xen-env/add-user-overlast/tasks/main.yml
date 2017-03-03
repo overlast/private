@@ -1,0 +1,4 @@
+---
+
+- name:
+  copy: src=etc/ld.so.conf.d/local.conf dest=/etc/ld.so.conf.d/local.conf owner=root group=root mode=444

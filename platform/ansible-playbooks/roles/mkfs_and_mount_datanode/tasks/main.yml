@@ -1,0 +1,83 @@
+---
+- name: Create /hadoop directory to set as dfs.data.dir
+  file: path=/hadoop state=directory owner=root group=root mode=0755
+
+- name: Create /data/N directories to set as dfs.data.dir
+  file: path=/hadoop/{{item}} state=directory owner=root group=root mode=0755
+  with_items:
+    - 01
+    - 01/hdfs
+    - 01/yarn
+    - 02
+    - 03
+    - 04
+
+- name: Create /data/N directories to set as dfs.data.dir
+  file: path=/hadoop/{{item}} state=directory owner=hdfs group=hadoop mode=0750
+  with_items:
+    - 01/hdfs/data
+
+- name: Create /data/N directories to set as dfs.data.dir
+  file: path=/hadoop/{{item}} state=directory owner=yarn group=root mode=0755
+  with_items:
+    - 01/yarn/local
+    - 01/yarn/log
+
+- name: umount /dev/sdb
+  mount: name=/hadoop/02 src=/dev/sdb fstype=ext4 state=unmounted
+  ignore_errors: True
+
+- name: umount /dev/sdc
+  mount: name=/hadoop/03 src=/dev/sdc fstype=ext4 state=unmounted
+  ignore_errors: True
+
+- name: umount /dev/sdd
+  mount: name=/hadoop/04 src=/dev/sdd fstype=ext4 state=unmounted
+  ignore_errors: True
+
+- name: Create a ext4 filesystem on /dev/sdb and check disk blocks.
+  shell: mkfs.ext4 -F -t ext4 -m 1 -O dir_index,extent,sparse_super {{item}}
+  poll: 15
+  with_items:
+    - /dev/sdb
+    - /dev/sdc
+    - /dev/sdd
+
+- name: write information of /hadoop/hdfs/01 to /etc/fstab
+  mount: name=/hadoop/01 src=/hadoop/01 fstype=ext4 opts="noatime,nodiratime" state=present
+
+- name: mount /dev/sdb
+  mount: name=/hadoop/02 src=/dev/sdb fstype=ext4 opts="noatime,nodiratime" state=mounted
+
+- name: mount /dev/sdc
+  mount: name=/hadoop/03 src=/dev/sdc fstype=ext4 opts="noatime,nodiratime" state=mounted
+
+- name: mount /dev/sdd
+  mount: name=/hadoop/04 src=/dev/sdd fstype=ext4 opts="noatime,nodiratime" state=mounted
+
+- name: Create /hadoop/N/hdfs/data directories to set as dfs.data.dir
+  file: path=/hadoop/{{item}} state=directory owner=root group=root mode=0755
+  with_items:
+    - 02/hdfs
+    - 02/yarn
+    - 03/hdfs
+    - 03/yarn
+    - 04/hdfs
+    - 04/yarn
+
+- name: Create /data/N directories to set as dfs.data.dir
+  file: path=/hadoop/{{item}}/hdfs/data state=directory owner=hdfs group=hadoop mode=0750
+  with_items:
+    - 02
+    - 03
+    - 04
+
+- name: Create /data/N directories to set as dfs.data.dir
+  file: path=/hadoop/{{item}} state=directory owner=yarn group=root mode=0755
+  with_items:
+    - 02/yarn/local
+    - 02/yarn/log
+    - 03/yarn/local
+    - 03/yarn/log
+    - 04/yarn/local
+    - 04/yarn/log

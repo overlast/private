@@ -1,0 +1,5 @@
+- hosts: all_servers
+  user: overlast
+  sudo: True
+  roles:
+     - make-xen-env/add-user-overlast

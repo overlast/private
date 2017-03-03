@@ -1,0 +1,6 @@
+---
+- name: Install 'Development tools'
+  shell: |
+    yum install -y @"Development tools" | grep -c "^Nothing to do" || :
+  register: result
+  changed_when: result.stdout == "0"

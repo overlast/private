@@ -1,0 +1,3 @@
+---
+- name:
+  shell: pip install word2vec

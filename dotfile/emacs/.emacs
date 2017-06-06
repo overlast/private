@@ -26,8 +26,10 @@
 
 ; Add package-archives
 (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
-(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
+(add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages/"))
 
 ; Initialize
 (package-initialize)
@@ -41,9 +43,9 @@
     flymake-easy
     recentf-ext
     anything
+    helm-core
     helm
     popwin
-    browse-kill-ring
     el-get
     auto-complete
     color-theme
@@ -55,16 +57,22 @@
     flymake-cursor
     git-gutter
     git-gutter-fringe
+    color-theme-sanityinc-solarized
     color-theme-solarized
+    solarized-theme
     flymake-python-pyflakes
     ruby-mode
     gud
     google-c-style
+    use-package
     ag
     wgrep
     wgrep-ag
     markdown-mode
     yasnippet
+    smex
+    ido-ubiquitous
+    ido-vertical-mode
     ))
 (let ((not-installed (loop for x in installing-package-list
                             when (not (package-installed-p x))
@@ -141,7 +149,14 @@
         (:name direx
                :description "direx"
                :type git
-               :url "git://github.com/m2ym/direx-el.git"
+;               :url "git://github.com/m2ym/direx-el.git"
+               :url "https://github.com/m2ym/direx-el.git"
+               :load-path (".")
+               )
+        (:name browse-kill-ring
+               :description "browse-kill-ring"
+               :type git
+               :url "https://github.com/browse-kill-ring/browse-kill-ring.git"
                :load-path (".")
                )
         (:name dabbrev-ja
@@ -163,9 +178,12 @@
           :load-path (".")
           )
         (:name auto-highlight-symbol
-               :type github
-               :pkgname "emacsmirror/auto-highlight-symbol"
-               )
+               :description "auto-highlight-symbol"
+               :type git
+               :url "https://github.com/mhayashi1120/auto-highlight-symbol-mode.git"
+	       :load-path (".")
+	       )
+					;               )
         (:name longlines-jp
                :type httpb
                :pkgname "http://www.emacswiki.org/emacs/download/longlines-jp.el"
@@ -173,6 +191,17 @@
         )
       )
 (el-get 'sync)
+
+;======================================================================
+; use-package
+;======================================================================
+
+
+(eval-when-compile (require 'use-package))
+(require 'diminish)    ;; if you use :diminish
+(require 'bind-key)    ;; if you use any :bind variant
+(setq use-package-verbose t)
+(setq use-package-minimum-reported-time 0.001)
 
 ;======================================================================
 ; Setting about languages and charactor encodings
@@ -205,7 +234,7 @@
 (savehist-mode 1) ; saving history of mini buffer
 (setq recentf-max-saved-items 10000) ; setting length of recent open file list
 (add-to-list 'default-frame-alist '(cursor-color . "SlateGray")) ; change the cursor color
-(iswitchb-mode 1) ;; open muffer list in mini buffer (C-x b)
+;(iswitchb-mode 1) ;; open muffer list in mini buffer (C-x b)
 (global-auto-revert-mode 1) ;; revert file when a file is change in other buffer
 (windmove-default-keybindings)
 (setq undo-limit 100000)
@@ -276,6 +305,13 @@
 (require 'dabbrev-highlight)
 
 ;======================================================================
+;; abbrev
+;======================================================================
+(setq abbrev-file-name "~/.abbrev_defs")
+(setq save-abbrevs t)
+(quietly-read-abbrev-file)
+
+;======================================================================
 ; Automatic spell checker
 ; http://www.clear-code.com/blog/2012/3/20.htm
 ;======================================================================
@@ -331,22 +367,63 @@
 ; http://d.hatena.ne.jp/rubikitch/20100718/anything
 ;======================================================================
 
-(require 'helm-config)
-(setq helm-idle-delay             0.05
-      helm-input-idle-delay       0.1
-      helm-candidate-number-limit 100)
-(helm-mode 1)
-(when (require 'helm-config nil t)
-  (global-set-key (kbd "C-x b") 'helm-buffers-list)
-  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+;(require 'helm-config)
+;(setq helm-idle-delay             0.05
+;      helm-input-idle-delay       0.1
+;      helm-candidate-number-limit 100)
+;(helm-mode 1)
+;(when (require 'helm-config nil t)
+;  (global-set-key (kbd "C-x b") 'helm-buffers-list)
+;  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
 ;  (helm-dired-bindings 1)
-)
+;)
 ;; 自動補完を無効
-(custom-set-variables '(helm-ff-auto-update-initial-value nil))
-;; C-hでバックスペースと同じように文字を削除
-(define-key helm-c-read-file-map (kbd "C-h") 'delete-backward-char)
+;(custom-set-variables '(helm-ff-auto-update-initial-value nil))
+;;; C-hでバックスペースと同じように文字を削除
+;(define-key helm-c-read-file-map (kbd "C-h") 'delete-backward-char)
 ;; TABで任意補完。選択肢が出てきたらC-nやC-pで上下移動してから決定することも可能
-(define-key helm-c-read-file-map (kbd "TAB") 'helm-execute-persistent-action)
+;(define-key helm-c-read-file-map (kbd "TAB") 'helm-execute-persistent-action)
+
+;======================================================================
+; ido.el
+;======================================================================
+
+(require 'ido-ubiquitous)
+(require 'ido-vertical-mode)
+(use-package ido
+	     :bind
+	     (("C-x C-r" . ido-recentf-open)
+	      ("C-x C-f" . ido-find-file)
+	      ("C-x C-d" . ido-dired)
+	      ("C-x b" . ido-switch-buffer)
+	      ("C-x C-b" . ido-switch-buffer)
+	      ("M-x" . smex))
+	     :init
+	     (defun ido-recentf-open ()
+	       "Use `ido-completing-read' to \\[find-file] a recent file"
+	       (interactive)
+	       (if (find-file (ido-completing-read "Find recent file: " recentf-list))
+		   (message "Opening file...")
+		 (message "Aborting")))
+	     :config
+	     (ido-mode 1)
+	     (ido-ubiquitous-mode 1)
+	     (setq ido-enable-flex-matching t)
+	     (setq ido-save-directory-list-file "~/.emacs.d/cache/ido.last")
+	     (ido-vertical-mode 1)
+	     (setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
+	     (setq ido-max-window-height 0.75)
+	     )
+(require 'smex)
+(use-package smex
+	     :bind
+	     (("M-x" . smex))
+	     :init
+	     (setq smex-save-file "~/.emacs.d/cache/.smex-items")
+	     :config
+	     (smex-initialize)
+	       )
+
 
 ;======================================================================
 ; recent.el

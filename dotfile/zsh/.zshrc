@@ -336,7 +336,7 @@ function google() {
   # mozilla -remote openURL\(http::/www.google.co.jp/$opt\) # 未テスト
 }
 alias ggl=google
-alias emacs="TERM=screen-256color emacs -nw"
+#alias emacs="TERM=screen-256color emacs -nw"
 alias javac='javac -J-Dfile.encoding=UTF-8'
 alias java='java -Dfile.encoding=UTF-8'
 
@@ -551,20 +551,21 @@ if [ -d /opt/rh/ ] ; then
 fi
 
 
-if [ -d /usr/local/xbuild/ ]; then
-    if [ -d /usr/local/xbuild/python ]; then
-        if [ -d /usr/local/xbuild/python/bin ]; then
-            export PATH=$PATH:/usr/local/xbuild/python/bin
+
+if [ -d $HOME/local/xbuild/ ]; then
+    if [ -d $HOME/local/xbuild/python ]; then
+        if [ -d $HOME/local/xbuild/python/bin ]; then
+            export PATH=$HOME/local/xbuild/python/bin:$PATH
         fi
     fi
-    if [ -d /usr/local/xbuild/ruby ]; then
-        if [ -d /usr/local/xbuild/ruby/bin ]; then
-            export PATH=$PATH:/usr/local/xbuild/ruby/bin
+    if [ -d $HOME/local/xbuild/ruby ]; then
+        if [ -d $HOME/local/xbuild/ruby/bin ]; then
+            export PATH=$HOME/local/xbuild/ruby/bin:$PATH
         fi
     fi
-    if [ -d /usr/local/xbuild/perl ]; then
-        if [ -d /usr/local/xbuild/perl/bin ]; then
-            export PATH=$PATH:/usr/local/xbuild/perl/bin
+    if [ -d $HOME/local/xbuild/perl ]; then
+        if [ -d $HOME/local/xbuild/perl/bin ]; then
+            export PATH=$HOME/local/xbuild/perl/bin:$PATH
         fi
     fi
 fi
